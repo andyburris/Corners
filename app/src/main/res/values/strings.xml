@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Corners</string>
+    <string name="action_settings">Settings</string>
+    <string name="size_setting">Size</string>
+    <string name="overlay_toggle">Overlay</string>
+    <string name="notification_title">Corner Overlay</string>
+    <string name="notification_text">Corner is overlaying. You might want to hide this notification by long pressing.</string>
+    <string name="notification_hide_title">Hide Notification</string>
+    <string name="notification_hide_text">To ensure the service won\'t be killed when memory is low, a notification needs to be shown.
+        However since this is the app\'s only notification, you can hide it and it will achieve the same effect.
+        Do this by long pressing on the notification and toggling the switch. You can always reshow it by going to the app\'s settings.
+        You can show this tutorial again in the overflow menu.</string>
+    <string name="notification_hide_kill">OK</string>
+
+
+
+</resources>
