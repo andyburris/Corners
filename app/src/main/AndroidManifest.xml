@@ -27,7 +27,9 @@
             </intent-filter>
         </activity>
         <service android:name=".CornerService"
-            android:label="CornerService">
+            android:label="CornerService"
+            android:configChanges="keyboardHidden|orientation">
+
 
         </service>
     </application>

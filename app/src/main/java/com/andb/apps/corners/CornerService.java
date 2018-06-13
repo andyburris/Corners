@@ -7,17 +7,21 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import java.lang.reflect.InvocationTargetException;
 
 
 public class CornerService extends Service {
@@ -47,7 +51,6 @@ public class CornerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
 
 
         first = false;
@@ -116,17 +119,44 @@ public class CornerService extends Service {
         mView = inflater.inflate(R.layout.overlay, null);
         setSize(getApplicationContext());
 
+        Point screenSize = getRealScreenSize(this);
 
+
+        int height = screenSize.y;
+        int width = screenSize.x;
+
+        startOverlay(height, width);
+
+
+    }
+
+    public static void startOverlay(int height, int width) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            params = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 0, -56,
+            params = new WindowManager.LayoutParams(width, height
+
+                    /*ViewGroup.LayoutParams.MATCH_PARENT*/, 0, 0,
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                            | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                            | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                     PixelFormat.TRANSLUCENT);
         } else {
-            params = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT, 0, -56
+            params = new WindowManager.LayoutParams(width,
+                    height, 0, 0
                     , WindowManager.LayoutParams.TYPE_PRIORITY_PHONE,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                            | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                            | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                     PixelFormat.TRANSLUCENT);
         }
 
@@ -138,14 +168,39 @@ public class CornerService extends Service {
 
         Log.d("popupWindowService", Boolean.toString(first));
 
-        if(first){
+        if (first) {
             MainActivityFragment.showTutorial();
         }
+    }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        Point screenSize = getRealScreenSize(this);
+
+        windowManager.removeViewImmediate(mView);
+
+
+        int height = screenSize.y;
+        int width = screenSize.x;
+
+        startOverlay(height, width);
 
     }
 
 
+    public static Point getRealScreenSize(Context context) {
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
 
+            display.getRealSize(size);
+
+
+        return size;
+    }
 
     public static void setSize(Context context) {
         final float scale = context.getResources().getDisplayMetrics().density;

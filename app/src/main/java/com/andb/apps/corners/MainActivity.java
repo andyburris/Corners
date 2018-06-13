@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         }else {
             getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccent));
         }
+
     }
 
     @Override

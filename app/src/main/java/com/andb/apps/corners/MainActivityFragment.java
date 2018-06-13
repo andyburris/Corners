@@ -57,12 +57,15 @@ public class MainActivityFragment extends Fragment {
         size = getSavedCornerSize(getActivity().getApplicationContext());
         toggleState = getSavedToggleState(getActivity().getApplicationContext());
 
+
+
         super.onViewCreated(view, savedInstanceState);
         final TextView position = (TextView) view.findViewById(R.id.currentVal);
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBar);
         Switch overlayToggle = (Switch) view.findViewById(R.id.overlay_toggle);
         //final TextView tutorial = (TextView) view.findViewById(R.id.nideNotifTutorialLaunch);
 
+        overlayToggle.setChecked(toggleState);
         seekBar.setProgress(size);
         position.setText(Integer.toString(size));
 
