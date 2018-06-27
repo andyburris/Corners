@@ -196,7 +196,7 @@ public class MainActivityFragment extends Fragment {
         editor.apply();
     }
 
-    public int getSavedCornerSize(Context ctxt) {
+    public static int getSavedCornerSize(Context ctxt) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
         if (prefs.contains("corner_size"))
             return prefs.getInt("corner_size", 12);
@@ -210,7 +210,7 @@ public class MainActivityFragment extends Fragment {
         editor.apply();
     }
 
-    public boolean getSavedToggleState(Context ctxt) {
+    public static boolean getSavedToggleState(Context ctxt) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
         if (prefs.contains("toggle_state"))
             return prefs.getBoolean("toggle_state", true);
