@@ -170,6 +170,9 @@ public class CornerService extends Service {
 
         if (first) {
             MainActivityFragment.showTutorial();
+
+
+
         }
     }
 
