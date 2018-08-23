@@ -160,7 +160,7 @@ public class MainActivityFragment extends Fragment {
     @TargetApi(Build.VERSION_CODES.M)
     public void checkDrawOverlayPermission() {
         /** check if we already  have permission to draw over other apps */
-        if (!Settings.canDrawOverlays(getActivity().getApplicationContext())) {
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M && !Settings.canDrawOverlays(getActivity().getApplicationContext())) {
             /** if not construct intent to request permission */
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getActivity().getPackageName()));
