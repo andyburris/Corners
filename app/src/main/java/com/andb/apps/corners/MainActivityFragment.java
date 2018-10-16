@@ -63,7 +63,7 @@ public class MainActivityFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         final TextView position = (TextView) view.findViewById(R.id.currentVal);
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBar);
-        Switch overlayToggle = (Switch) view.findViewById(R.id.overlay_toggle);
+        final Switch overlayToggle = (Switch) view.findViewById(R.id.overlay_toggle);
         //final TextView tutorial = (TextView) view.findViewById(R.id.nideNotifTutorialLaunch);
 
         overlayToggle.setChecked(toggleState);
@@ -113,14 +113,18 @@ public class MainActivityFragment extends Fragment {
                         if (Settings.canDrawOverlays(getActivity().getApplicationContext())) {
                             Log.d("serviceStart", "service started");
                             getActivity().startService(serviceIntent);
+                            toggleState = isChecked;
                         } else {
                             checkDrawOverlayPermission();
+                            overlayToggle.setChecked(false);
                         }
                     } else {
                         getActivity().startService(serviceIntent);
+                        toggleState = isChecked;
                     }
                 } else {
                     getActivity().stopService(serviceIntent);
+                    toggleState = isChecked;
                 }
                 Log.d("popupWindow", Boolean.toString(CornerService.first));
                 Log.d("popupWindow", Boolean.toString(isChecked));
@@ -194,6 +198,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        Log.d("saveToggle", "onPause");
         saveCornerSize(getActivity().getApplicationContext(), size);
         saveToggleState(getActivity().getApplicationContext(), toggleState);
     }
@@ -213,6 +218,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void saveToggleState(Context ctxt, boolean toggleState) {
+        Log.d("saveToggle", "Saving as " + Boolean.toString(toggleState));
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("toggle_state", toggleState);
@@ -220,6 +226,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     public static boolean getSavedToggleState(Context ctxt) {
+        Log.d("saveToggle", "Loading toggle state");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
         if (prefs.contains("toggle_state"))
             return prefs.getBoolean("toggle_state", true);
