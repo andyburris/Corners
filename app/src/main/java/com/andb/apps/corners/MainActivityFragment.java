@@ -28,7 +28,7 @@ import android.widget.Toast;
 public class MainActivityFragment extends Fragment {
 
     public static int size = 12;
-    public boolean toggleState = true;
+    public boolean toggleState = false;
 
     public int REQUEST_CODE = 34387;
 
@@ -223,6 +223,6 @@ public class MainActivityFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
         if (prefs.contains("toggle_state"))
             return prefs.getBoolean("toggle_state", true);
-        else return true;
+        else return false;
     }
 }
