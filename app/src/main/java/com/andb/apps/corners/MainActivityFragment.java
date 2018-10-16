@@ -20,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -75,7 +76,15 @@ public class MainActivityFragment extends Fragment {
                 position.setText(Integer.toString(progress));
                 size = progress;
                 CornerService.size = size;
-                CornerService.setSize(getActivity().getApplicationContext());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Settings.canDrawOverlays(getActivity().getApplicationContext())) {
+                        Log.d("change size", "change size");
+                        CornerService.setSize(getActivity().getApplicationContext());
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "Overlay permission not granted", Toast.LENGTH_SHORT).show();                    }
+                } else {
+                    CornerService.setSize(getActivity().getApplicationContext());
+                }
             }
 
             @Override
