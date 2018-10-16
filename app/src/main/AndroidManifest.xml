@@ -2,10 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.andb.apps.corners">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 
     <application
@@ -23,27 +22,25 @@
                 <action android:name="android.intent.action.MAIN" />
 
 
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".CornerService"
+        <service
+            android:name=".CornerService"
+            android:configChanges="keyboardHidden|orientation"
             android:label="CornerService"
-            android:configChanges="keyboardHidden|orientation">
+            android:permission="android.permission.BIND_JOB_SERVICE" >
 
 
-        </service>
+    </service>
 
-        <receiver android:name=".Autostart">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+    <receiver android:name=".Autostart">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+        </intent-filter>
+    </receiver>
 
-    </application>
-
-
+</application>
 
 
-
-</manifest>
+    </manifest>

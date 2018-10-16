@@ -13,8 +13,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -26,7 +24,7 @@ import android.widget.TextView;
 import java.lang.reflect.InvocationTargetException;
 
 
-public class CornerService extends JobIntentService {
+public class CornerService extends Service {
 
     static View mView;
 
@@ -44,11 +42,6 @@ public class CornerService extends JobIntentService {
     public static int NOTIFICATION_ID = 1;
     public static String channelId = "default_channel_id";
 
-
-    @Override
-    protected void onHandleWork(@NonNull Intent intent){
-
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
