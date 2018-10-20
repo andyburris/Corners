@@ -166,6 +166,9 @@ public class CornerService extends Service {
 
         windowManager.addView(mView, params);
 
+        MainActivityFragment.setIndividualVisibility();
+
+
         Log.d("popupWindowService", Boolean.toString(first));
 
         if (first) {
@@ -206,23 +209,27 @@ public class CornerService extends Service {
     }
 
     public static void setSize(Context context) {
-        final float scale = context.getResources().getDisplayMetrics().density;
 
-        int dpAdjust = (int) (size * scale + 0.5f);
 
-        TextView topLeft = (TextView) mView.findViewById(R.id.topLeft);
-        TextView topRight = (TextView) mView.findViewById(R.id.topRight);
-        TextView bottomLeft = (TextView) mView.findViewById(R.id.bottomLeft);
-        TextView bottomRight = (TextView) mView.findViewById(R.id.bottomRight);
+        if(mView!=null) {
+            final float scale = context.getResources().getDisplayMetrics().density;
 
-        topLeft.setWidth(dpAdjust);
-        topLeft.setHeight(dpAdjust);
-        topRight.setWidth(dpAdjust);
-        topRight.setHeight(dpAdjust);
-        bottomLeft.setWidth(dpAdjust);
-        bottomLeft.setHeight(dpAdjust);
-        bottomRight.setWidth(dpAdjust);
-        bottomRight.setHeight(dpAdjust);
+            int dpAdjust = (int) (size * scale + 0.5f);
+
+            TextView topLeft = (TextView) mView.findViewById(R.id.topLeft);
+            TextView topRight = (TextView) mView.findViewById(R.id.topRight);
+            TextView bottomLeft = (TextView) mView.findViewById(R.id.bottomLeft);
+            TextView bottomRight = (TextView) mView.findViewById(R.id.bottomRight);
+
+            topLeft.setWidth(dpAdjust);
+            topLeft.setHeight(dpAdjust);
+            topRight.setWidth(dpAdjust);
+            topRight.setHeight(dpAdjust);
+            bottomLeft.setWidth(dpAdjust);
+            bottomLeft.setHeight(dpAdjust);
+            bottomRight.setWidth(dpAdjust);
+            bottomRight.setHeight(dpAdjust);
+        }
 
     }
 

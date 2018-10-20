@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -29,6 +30,12 @@ public class MainActivityFragment extends Fragment {
 
     public static int size = 12;
     public boolean toggleState = false;
+
+    public static boolean topLState = true;
+    public static boolean topRState = true;
+    public static boolean bottomLState = true;
+    public static boolean bottomRState = true;
+
 
     public int REQUEST_CODE = 34387;
 
@@ -57,7 +64,7 @@ public class MainActivityFragment extends Fragment {
 
         size = getSavedCornerSize(getActivity().getApplicationContext());
         toggleState = getSavedToggleState(getActivity().getApplicationContext());
-
+        getIndividualState(getActivity().getApplicationContext());
 
 
         super.onViewCreated(view, savedInstanceState);
@@ -81,7 +88,8 @@ public class MainActivityFragment extends Fragment {
                         Log.d("change size", "change size");
                         CornerService.setSize(getActivity().getApplicationContext());
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "Overlay permission not granted", Toast.LENGTH_SHORT).show();                    }
+                        Toast.makeText(getActivity().getApplicationContext(), "Overlay permission not granted", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     CornerService.setSize(getActivity().getApplicationContext());
                 }
@@ -135,7 +143,95 @@ public class MainActivityFragment extends Fragment {
 
         });
 
+        individualToggleCheck(view);
 
+
+    }
+
+    public void individualToggleCheck(View view) {
+        CheckBox topL = view.findViewById(R.id.switchTopL);
+        CheckBox topR = view.findViewById(R.id.switchTopR);
+        CheckBox bottomL = view.findViewById(R.id.switchBottomL);
+        CheckBox bottomR = view.findViewById(R.id.switchBottomR);
+
+        topL.setChecked(topLState);
+        topR.setChecked(topRState);
+        bottomL.setChecked(bottomLState);
+        bottomR.setChecked(bottomRState);
+
+
+
+
+
+        topL.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                topLState = isChecked;
+                setIndividualVisibility();
+
+            }
+        });
+        topR.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d("CheckChange", "topR");
+                topRState = isChecked;
+                setIndividualVisibility();
+
+            }
+        });
+        bottomL.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d("CheckChange", "botL");
+                bottomLState = isChecked;
+                setIndividualVisibility();
+            }
+        });
+        bottomR.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d("CheckChange", "botR");
+                bottomRState = isChecked;
+                setIndividualVisibility();
+
+            }
+        });
+
+
+    }
+
+    public static void setIndividualVisibility(){
+        if(CornerService.mView!=null) {
+            final TextView topLeft = (TextView) CornerService.mView.findViewById(R.id.topLeft);
+            final TextView topRight = (TextView) CornerService.mView.findViewById(R.id.topRight);
+            final TextView bottomLeft = (TextView) CornerService.mView.findViewById(R.id.bottomLeft);
+            final TextView bottomRight = (TextView) CornerService.mView.findViewById(R.id.bottomRight);
+
+            if(topLState){
+                topLeft.setVisibility(View.VISIBLE);
+            }else {
+                topLeft.setVisibility(View.INVISIBLE);
+            }
+
+            if(topRState){
+                topRight.setVisibility(View.VISIBLE);
+            }else {
+                topRight.setVisibility(View.INVISIBLE);
+            }
+
+            if(bottomLState){
+                bottomLeft.setVisibility(View.VISIBLE);
+            }else {
+                bottomLeft.setVisibility(View.INVISIBLE);
+            }
+
+            if(bottomRState){
+                bottomRight.setVisibility(View.VISIBLE);
+            }else {
+                bottomRight.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     public static void showTutorial() {
@@ -173,7 +269,7 @@ public class MainActivityFragment extends Fragment {
     @TargetApi(Build.VERSION_CODES.M)
     public void checkDrawOverlayPermission() {
         /** check if we already  have permission to draw over other apps */
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M && !Settings.canDrawOverlays(getActivity().getApplicationContext())) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getActivity().getApplicationContext())) {
             /** if not construct intent to request permission */
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getActivity().getPackageName()));
@@ -201,6 +297,7 @@ public class MainActivityFragment extends Fragment {
         Log.d("saveToggle", "onPause");
         saveCornerSize(getActivity().getApplicationContext(), size);
         saveToggleState(getActivity().getApplicationContext(), toggleState);
+        saveIndivdualState(getActivity().getApplicationContext(), topLState, topRState, bottomLState, bottomRState);
     }
 
     public void saveCornerSize(Context ctxt, int size) {
@@ -231,5 +328,35 @@ public class MainActivityFragment extends Fragment {
         if (prefs.contains("toggle_state"))
             return prefs.getBoolean("toggle_state", true);
         else return false;
+    }
+
+    public void saveIndivdualState(Context ctxt, boolean topL, boolean topR, boolean botL, boolean botR){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putBoolean("topL", topL);
+        editor.putBoolean("topR", topR);
+        editor.putBoolean("botL", botL);
+        editor.putBoolean("botR", botR);
+
+
+        editor.apply();
+
+    }
+
+    public static void getIndividualState(Context ctxt){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+        if(prefs.contains("topL")){
+            topLState = prefs.getBoolean("topL", true);
+        }
+        if(prefs.contains("topR")){
+            topRState = prefs.getBoolean("topR", true);
+        }
+        if(prefs.contains("botL")){
+            bottomLState = prefs.getBoolean("botL", true);
+        }
+        if(prefs.contains("botR")){
+            bottomRState = prefs.getBoolean("botR", true);
+        }
     }
 }
