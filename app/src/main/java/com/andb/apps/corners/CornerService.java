@@ -11,6 +11,9 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -118,6 +121,7 @@ public class CornerService extends Service {
 
         mView = inflater.inflate(R.layout.overlay, null);
         setSize(getApplicationContext());
+        setColor(MainActivityFragment.cornerColor);
 
         Point screenSize = getRealScreenSize(this);
 
@@ -167,6 +171,7 @@ public class CornerService extends Service {
         windowManager.addView(mView, params);
 
         MainActivityFragment.setIndividualVisibility();
+        setColor(MainActivityFragment.cornerColor);
 
 
         Log.d("popupWindowService", Boolean.toString(first));
@@ -174,7 +179,7 @@ public class CornerService extends Service {
         if (first) {
             MainActivityFragment.showTutorial();
 
-
+            first = false;
 
         }
     }
@@ -192,6 +197,7 @@ public class CornerService extends Service {
         int height = screenSize.y;
         int width = screenSize.x;
 
+        Log.d("configchange", "config changed, restarting overlay");
         startOverlay(height, width);
 
     }
@@ -232,6 +238,29 @@ public class CornerService extends Service {
         }
 
     }
+
+    public static void setColor(int color){
+
+        Log.d("setColor" , "setting color: " + Integer.toHexString(color));
+        if(mView!=null) {
+
+            TextView topLeft = (TextView) mView.findViewById(R.id.topLeft);
+            TextView topRight = (TextView) mView.findViewById(R.id.topRight);
+            TextView bottomLeft = (TextView) mView.findViewById(R.id.bottomLeft);
+            TextView bottomRight = (TextView) mView.findViewById(R.id.bottomRight);
+
+
+            topLeft.getBackground().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            topRight.getBackground().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            bottomLeft.getBackground().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            bottomRight.getBackground().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+
+            Log.d("setColor", "done setting color");
+        }
+
+    }
+
 
     @Override
     public void onDestroy() {

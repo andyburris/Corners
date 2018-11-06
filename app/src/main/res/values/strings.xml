@@ -12,6 +12,9 @@
         You can show this tutorial again in the overflow menu.</string>
     <string name="notification_hide_kill">OK</string>
     <string name="individual_toggle_title">Individual Corners</string>
+    <string name="individual_overflow">Individual Corners</string>
+    <string name="corner_color_string">Corner Color </string>
+    <string name="advanced_toggle_title">More Settings</string>
 
 
 </resources>

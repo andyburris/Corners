@@ -1,5 +1,6 @@
 package com.andb.apps.corners;
 
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,23 +11,34 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.transition.ChangeBounds;
+import androidx.transition.TransitionManager;
+import androidx.transition.TransitionSet;
+
+import androidx.fragment.app.Fragment;
+import androidx.cardview.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaredrummler.android.colorpicker.ColorPanelView;
+import com.jaredrummler.android.colorpicker.ColorPickerDialog;
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment /*implements ColorPickerDialogListener*/ {
 
     public static int size = 12;
     public boolean toggleState = false;
@@ -35,6 +47,11 @@ public class MainActivityFragment extends Fragment {
     public static boolean topRState = true;
     public static boolean bottomLState = true;
     public static boolean bottomRState = true;
+
+    public boolean individualCollapse = true;
+
+    public static int cornerColor = -16777216 /*black*/;
+    public static final int DIALOG_ID = 0;
 
 
     public int REQUEST_CODE = 34387;
@@ -65,6 +82,7 @@ public class MainActivityFragment extends Fragment {
         size = getSavedCornerSize(getActivity().getApplicationContext());
         toggleState = getSavedToggleState(getActivity().getApplicationContext());
         getIndividualState(getActivity().getApplicationContext());
+        cornerColor = getSavedCornerColor(getActivity().getApplicationContext());
 
 
         super.onViewCreated(view, savedInstanceState);
@@ -145,6 +163,23 @@ public class MainActivityFragment extends Fragment {
 
         individualToggleCheck(view);
 
+        ConstraintLayout colorPreview = (ConstraintLayout) view.findViewById(R.id.colorPreviewLayout);
+        ColorPanelView colorPanelView = (ColorPanelView) view.findViewById(R.id.tagColorPreview);
+        colorPanelView.setColor(cornerColor);
+
+        colorPreview.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Log.d("gotToCode", "Color dialog should appear");
+                ColorPickerDialog.newBuilder()
+                        .setColor(cornerColor)
+                        .setShowAlphaSlider(false)
+                        .setDialogId(DIALOG_ID)
+                        .show(getActivity());
+            }
+        });
+
 
     }
 
@@ -198,6 +233,44 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
+        final ImageView collapseButton = view.findViewById(R.id.collapseButton);
+        final CardView individualCard = view.findViewById(R.id.individual_card);
+
+
+
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+        final int pixels = (int) (52 * scale + 0.5f);
+
+        ViewGroup.LayoutParams params = individualCard.getLayoutParams();
+        params.height = pixels;
+
+        collapseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(individualCollapse){
+                    individualCollapse = false;
+
+                    TransitionManager.beginDelayedTransition(individualCard, new TransitionSet()
+                            .addTransition(new ChangeBounds()));
+                    ViewGroup.LayoutParams params = individualCard.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    individualCard.setLayoutParams(params);
+
+                    collapseButton.animate().setDuration(100).rotation(0).setListener(new AnimatorListenerAdapter() {
+                    });
+
+                }else {
+                    individualCollapse = true;
+                    TransitionManager.beginDelayedTransition(individualCard, new TransitionSet()
+                            .addTransition(new ChangeBounds()));
+                    ViewGroup.LayoutParams params = individualCard.getLayoutParams();
+                    params.height = pixels;
+                    individualCard.setLayoutParams(params);
+                    collapseButton.animate().setDuration(100).rotation(180).setListener(new AnimatorListenerAdapter() {
+                    });
+                }
+            }
+        });
 
     }
 
@@ -298,6 +371,8 @@ public class MainActivityFragment extends Fragment {
         saveCornerSize(getActivity().getApplicationContext(), size);
         saveToggleState(getActivity().getApplicationContext(), toggleState);
         saveIndivdualState(getActivity().getApplicationContext(), topLState, topRState, bottomLState, bottomRState);
+        saveCornerColor(getActivity().getApplicationContext(), cornerColor);
+
     }
 
     public void saveCornerSize(Context ctxt, int size) {
@@ -358,5 +433,21 @@ public class MainActivityFragment extends Fragment {
         if(prefs.contains("botR")){
             bottomRState = prefs.getBoolean("botR", true);
         }
+    }
+
+    public void saveCornerColor(Context ctxt, int cornerColor) {
+        Log.d("saveColor", "Saving as " + Integer.toHexString(cornerColor));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("corner_color", cornerColor);
+        editor.apply();
+    }
+
+    public static int getSavedCornerColor(Context ctxt) {
+        Log.d("loadColor", "Loading color");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
+        if (prefs.contains("corner_color"))
+            return prefs.getInt("corner_color", -16777216);
+        else return -16777216;
     }
 }
