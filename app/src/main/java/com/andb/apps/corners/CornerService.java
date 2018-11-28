@@ -16,6 +16,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -23,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -129,8 +131,16 @@ public class CornerService extends Service {
         int height = screenSize.y;
         int width = screenSize.x;
 
-        startOverlay(height, width);
 
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            if (Settings.canDrawOverlays(getApplicationContext())) {
+                startOverlay(height, width);
+            }else {
+                Toast.makeText(getApplicationContext(), R.string.permission_service_sync_error_text, Toast.LENGTH_LONG).show();
+            }
+        }else {
+            startOverlay(height, width);
+        }
 
     }
 
@@ -191,14 +201,27 @@ public class CornerService extends Service {
 
         Point screenSize = getRealScreenSize(this);
 
-        windowManager.removeViewImmediate(mView);
+        try {
+            windowManager.removeViewImmediate(mView);
+        }catch (Exception e){
+            Toast.makeText(getApplicationContext(), R.string.permission_service_sync_error_text, Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
 
 
         int height = screenSize.y;
         int width = screenSize.x;
 
         Log.d("configchange", "config changed, restarting overlay");
-        startOverlay(height, width);
+
+
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            if (Settings.canDrawOverlays(getApplicationContext())) {
+                startOverlay(height, width);
+            }
+        }else {
+            startOverlay(height, width);
+        }
 
     }
 
@@ -222,10 +245,10 @@ public class CornerService extends Service {
 
             int dpAdjust = (int) (size * scale + 0.5f);
 
-            TextView topLeft = (TextView) mView.findViewById(R.id.topLeft);
-            TextView topRight = (TextView) mView.findViewById(R.id.topRight);
-            TextView bottomLeft = (TextView) mView.findViewById(R.id.bottomLeft);
-            TextView bottomRight = (TextView) mView.findViewById(R.id.bottomRight);
+            TextView topLeft = mView.findViewById(R.id.topLeft);
+            TextView topRight = mView.findViewById(R.id.topRight);
+            TextView bottomLeft = mView.findViewById(R.id.bottomLeft);
+            TextView bottomRight = mView.findViewById(R.id.bottomRight);
 
             topLeft.setWidth(dpAdjust);
             topLeft.setHeight(dpAdjust);
@@ -244,10 +267,10 @@ public class CornerService extends Service {
         Log.d("setColor" , "setting color: " + Integer.toHexString(color));
         if(mView!=null) {
 
-            TextView topLeft = (TextView) mView.findViewById(R.id.topLeft);
-            TextView topRight = (TextView) mView.findViewById(R.id.topRight);
-            TextView bottomLeft = (TextView) mView.findViewById(R.id.bottomLeft);
-            TextView bottomRight = (TextView) mView.findViewById(R.id.bottomRight);
+            TextView topLeft = mView.findViewById(R.id.topLeft);
+            TextView topRight = mView.findViewById(R.id.topRight);
+            TextView bottomLeft = mView.findViewById(R.id.bottomLeft);
+            TextView bottomRight = mView.findViewById(R.id.bottomRight);
 
 
             topLeft.getBackground().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
@@ -264,7 +287,14 @@ public class CornerService extends Service {
 
     @Override
     public void onDestroy() {
-        windowManager.removeViewImmediate(mView);
+
+        //bad code but prevents settings errors that I think might happen
+
+        try {
+            windowManager.removeViewImmediate(mView);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
 

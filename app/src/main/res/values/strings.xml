@@ -10,6 +10,8 @@
         However, since this is the app\'s only notification, you can hide it and it will achieve the same effect as having none at all.
         You can do this by long pressing on the notification and toggling the switch. You can always reshow it by going to the app\'s settings.
         You can show this tutorial again in the overflow menu.</string>
+    <string name="permission_service_sync_error_text">Corners: the overlay permission is not granted but you have the service turned on.
+        Please either turn off the service or grant the permission</string>
     <string name="notification_hide_kill">OK</string>
     <string name="individual_toggle_title">Individual Corners</string>
     <string name="individual_overflow">Individual Corners</string>
