@@ -1,4 +1,6 @@
 # Corners
 Simple Android app to round the corners of the screen
 
-v0.8
+Available on the [Play Store](https://play.google.com/store/apps/details?id=com.andb.apps.corners)
+
+v1.0
