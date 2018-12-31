@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28
@@ -38,6 +40,10 @@ dependencies {
     implementation 'com.github.recruit-lifestyle:FloatingView:2.3.2'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.jaredrummler:colorpicker:1.0.5' //color picker library
+    implementation 'com.jaredrummler:colorpicker:1.0.5'//color picker library
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+}
+repositories {
+    mavenCentral()
 }
