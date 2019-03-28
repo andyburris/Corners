@@ -1,10 +1,6 @@
 package com.andb.apps.corners
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -12,21 +8,16 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
-import android.view.Display
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
-
-import java.lang.reflect.InvocationTargetException
 
 
 class CornerService : Service() {
@@ -84,7 +75,7 @@ class CornerService : Service() {
 
         Log.d("serviceStart", "service started")
 
-        size = Values.size
+        sizes = Values.sizes
 
 
         /*WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -172,11 +163,10 @@ class CornerService : Service() {
         lateinit var windowManager: WindowManager
         lateinit var params: WindowManager.LayoutParams
 
-        var size: Int = 0
+        var sizes = arrayListOf(12, 12, 12, 12)
 
-
-        var NOTIFICATION_ID = 1
-        var channelId = "default_channel_id"
+        const val NOTIFICATION_ID = 1
+        const val channelId = "default_channel_id"
 
         fun startOverlay(height: Int, width: Int) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -190,7 +180,7 @@ class CornerService : Service() {
                                 or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                                 or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                                 or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                        PixelFormat.TRANSLUCENT)/*ViewGroup.LayoutParams.MATCH_PARENT*/
+                        PixelFormat.TRANSLUCENT)
             } else {
                 params = WindowManager.LayoutParams(width,
                         height, 0, 0, WindowManager.LayoutParams.TYPE_PRIORITY_PHONE,
@@ -228,21 +218,25 @@ class CornerService : Service() {
             if (mView != null) {
                 val scale = context.resources.displayMetrics.density
 
-                val dpAdjust = (size * scale + 0.5f).toInt()
+                val dpAdjustTopL = (sizes[0] * scale + 0.5f).toInt()
+                val dpAdjustTopR = (sizes[1] * scale + 0.5f).toInt()
+                val dpAdjustBotL = (sizes[2] * scale + 0.5f).toInt()
+                val dpAdjustBotR = (sizes[3] * scale + 0.5f).toInt()
+
 
                 val topLeft = mView!!.findViewById<TextView>(R.id.topLeft)
                 val topRight = mView!!.findViewById<TextView>(R.id.topRight)
                 val bottomLeft = mView!!.findViewById<TextView>(R.id.bottomLeft)
                 val bottomRight = mView!!.findViewById<TextView>(R.id.bottomRight)
 
-                topLeft.width = dpAdjust
-                topLeft.height = dpAdjust
-                topRight.width = dpAdjust
-                topRight.height = dpAdjust
-                bottomLeft.width = dpAdjust
-                bottomLeft.height = dpAdjust
-                bottomRight.width = dpAdjust
-                bottomRight.height = dpAdjust
+                topLeft.width = dpAdjustTopL
+                topLeft.height = dpAdjustTopL
+                topRight.width = dpAdjustTopR
+                topRight.height = dpAdjustTopR
+                bottomLeft.width = dpAdjustBotL
+                bottomLeft.height = dpAdjustBotL
+                bottomRight.width = dpAdjustBotR
+                bottomRight.height = dpAdjustBotR
             }
 
         }

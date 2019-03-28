@@ -28,8 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_keyboard_arrow_up_black_24dp" />
-                            <entry key="sourceFile" value="C:\Users\andb3003" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="ic_top_right" />
+                            <entry key="sourceFile" value="D:\Documents\Illustrator\Phone\Apps\Resources\Corners\SVG\Top Right.svg" />
                           </map>
                         </option>
                       </PersistentState>

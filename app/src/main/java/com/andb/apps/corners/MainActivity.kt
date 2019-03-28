@@ -1,6 +1,5 @@
 package com.andb.apps.corners
 
-import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Intent
@@ -11,28 +10,26 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.*
-import android.widget.FrameLayout
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
-import com.jaredrummler.android.colorpicker.ColorPanelView
+import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.dialog_custom_value.view.*
 import java.util.*
-
 
 class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     var individualCollapse = true
-    private val REQUEST_CODE: Int = 34387
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +40,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
     }
 
     private fun setupWindow() {
-        val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<View>(R.id.toolbar) as androidx.appcompat.widget.Toolbar
         setSupportActionBar(toolbar)
         toolbar.setTitleTextColor(Color.BLACK)
         toolbar.overflowIcon?.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP)
@@ -59,33 +56,23 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     private fun loadValues() {
         checkDrawOverlayPermission()
-        Values.size = Persist.getSavedCornerSize(this)
+        Values.sizes = Persist.getIndividualSizes(this)
         Values.toggleState = Persist.getSavedToggleState(this)
-        Persist.getIndividualState(this)
+        Values.cornerStates = Persist.getIndividualState(this)
         Values.cornerColor = Persist.getSavedCornerColor(this)
         Values.firstRun = Persist.getSavedFirstRun(this)
     }
 
     private fun setupContent() {
         overlay_toggle.isChecked = Values.toggleState
-        currentVal.text = Values.size.toString()
-        seekBar.progress = Values.size
+        currentVal.text = Values.commonSize().toString()
+        sizeDialog(currentVal, -1)
+        seekBar.progress = Values.commonSize()
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                Values.size = progress
-                CornerService.size = Values.size
-                currentVal.text = Values.size.toString()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (Settings.canDrawOverlays(this@MainActivity)) {
-                        Log.d("change size", "change size")
-                        CornerService.setSize(this@MainActivity)
-                    } else {
-                        Toast.makeText(this@MainActivity, "Overlay permission not granted", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    CornerService.setSize(this@MainActivity)
-                }
+                Values.sizes = Values.listFromSize(progress)
+                updateService()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -99,14 +86,14 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         overlay_toggle.setOnCheckedChangeListener { _, isChecked ->
             val serviceIntent = Intent(this, CornerService::class.java)
             Values.toggleState = isChecked
-            when(isChecked){
-                true->{
+            when (isChecked) {
+                true -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (Settings.canDrawOverlays(this)) {
                             Log.d("serviceStart", "service started")
                             startService(serviceIntent)
-                            if(Values.firstRun){
-                                showTutorial()
+                            if (Values.firstRun) {
+                                showHelp()
                                 Values.firstRun = false
                             }
                         } else {
@@ -117,7 +104,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                         startService(serviceIntent)
                     }
                 }
-                false->{
+                false -> {
                     stopService(serviceIntent)
                 }
             }
@@ -131,16 +118,19 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         collapseToggleSpace.setOnClickListener {
             if (individualCollapse) {
 
-                TransitionManager.beginDelayedTransition(individual_card, TransitionSet()
-                        .addTransition(ChangeBounds()))
+                TransitionManager.beginDelayedTransition(
+                    individual_card, TransitionSet().addTransition(ChangeBounds())
+                )
                 params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 individual_card.layoutParams = params
 
                 collapseButton.animate().setDuration(100).rotation(0f)
 
             } else {
-                TransitionManager.beginDelayedTransition(individual_card, TransitionSet()
-                        .addTransition(ChangeBounds()))
+                TransitionManager.beginDelayedTransition(
+                    individual_card, TransitionSet()
+                        .addTransition(ChangeBounds())
+                )
                 params.height = pixels
                 individual_card.layoutParams = params
                 collapseButton.animate().setDuration(100).rotation(180f)
@@ -148,20 +138,92 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
             individualCollapse = !individualCollapse
         }
 
+        tagColorPreview.color = Values.cornerColor
+        colorPreviewLayout.setOnClickListener {
+            ColorPickerDialog.newBuilder()
+                .setColor(Values.cornerColor)
+                .setShowAlphaSlider(false)
+                .setDialogId(DIALOG_ID)
+                .show(this)
+        }
 
-        switchTopL.setOnCheckedChangeListener { buttonView, isChecked ->
+        test_button.setOnClickListener {
+            test_image.setImageBitmap(ModifyWallpaper.applyToLockscreenWallpaper(this, this, Values.commonSize()/*TODO: Use all sizes*/, Values.cornerColor))
+        }
+
+        setupIndividual()
+
+    }
+
+    fun setupIndividual() {
+        switchTopL.isChecked = Values.cornerStates[0]
+        switchTopR.isChecked = Values.cornerStates[1]
+        switchBottomL.isChecked = Values.cornerStates[2]
+        switchBottomR.isChecked = Values.cornerStates[3]
+
+        switchTopL.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[0] = isChecked
+            setIndividualVisibility()
         }
-        switchTopR.setOnCheckedChangeListener { buttonView, isChecked ->
+        switchTopR.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[1] = isChecked
+            setIndividualVisibility()
         }
-        switchBottomL.setOnCheckedChangeListener{buttonView, isChecked ->
+        switchBottomL.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[2] = isChecked
+            setIndividualVisibility()
         }
-        switchBottomR.setOnCheckedChangeListener { buttonView, isChecked ->
+        switchBottomR.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[3] = isChecked
+            setIndividualVisibility()
         }
-        //TODO: Set in cornerservice
+
+        sizeDialog(switchTopL, 0)
+        sizeDialog(switchTopR, 1)
+        sizeDialog(switchBottomL, 2)
+        sizeDialog(switchBottomR, 3)
+
+    }
+
+    fun sizeDialog(view: View, index: Int) {
+        view.setOnLongClickListener {
+            val currentSize = if (index != -1) Values.sizes[index] else Values.commonSize()
+            Log.d("currentSize", "currentSize: $currentSize")
+
+            val dialogView = layoutInflater.inflate(R.layout.dialog_custom_value, null)
+            dialogView.customSizeEditText.setText(currentSize.toString())
+            AlertDialog.Builder(this).setView(dialogView)
+                .setPositiveButton(R.string.dialog_ok) { dialog, _ ->
+                    val size = dialogView.customSizeEditText.text.toString().toInt()
+                    if (index != -1) {
+                        Values.sizes[index] = size
+                    } else {
+                        Values.sizes = Values.listFromSize(size)
+                    }
+                    Log.d("newSizes", Values.sizes.toString())
+                    updateService()
+                    dialog.cancel()
+                }.show()
+
+            true
+        }
+    }
+
+    fun updateService() {
+        CornerService.sizes = Values.sizes
+        currentVal.text = Values.commonSize().toString()
+        seekBar.progress = Values.commonSize()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.canDrawOverlays(this@MainActivity)) {
+                Log.d("change size", "change size")
+                CornerService.setSize(this@MainActivity)
+            } else {
+                Toast.makeText(this@MainActivity, "Overlay permission not granted", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        } else {
+            CornerService.setSize(this@MainActivity)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -177,29 +239,23 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         val id = item.itemId
 
 
-        if (id == R.id.tutorial_from_menu) {
-            showTutorial()
-            return true
+        when(id){
+            R.id.menuItemHelp->showHelp()
         }
+
 
         return super.onOptionsItemSelected(item)
     }
 
-    fun showTutorial() {
-        Log.d("popupWindow", "clicked")
-
-        val inflater = LayoutInflater.from(this)
-        val tutorialView = inflater.inflate(R.layout.remove_notif_tutorial, null, false)
-
-        val alertDialogBuilder = AlertDialog.Builder(this)
-        alertDialogBuilder.setView(tutorialView)
-        val alertDialog = alertDialogBuilder.create()
-        alertDialog.show()
-
-        val ok = tutorialView.findViewById<TextView>(R.id.killText)
-        ok.setOnClickListener { alertDialog.hide() }
+    private fun showHelp(){
+        AlertDialog.Builder(this)
+            .setView(R.layout.help_dialog)
+            .setNegativeButton(R.string.dialog_ok) { dialog, _ ->
+                dialog.cancel()
+            }
+            .create()
+            .show()
     }
-
 
     //Request screenOverlay permission
     @TargetApi(Build.VERSION_CODES.M)
@@ -207,8 +263,10 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         /* check if we already  have permission to draw over other apps */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(applicationContext)) {
             /* if not construct intent to request permission */
-            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:$packageName"))
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
             /* request permission via start activity for result */
             startActivityForResult(intent, REQUEST_CODE)
         }
@@ -233,8 +291,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                 Log.d("colorSelected", Integer.toHexString(color))
                 // We got result from the dialog that is shown when clicking on the icon in the action bar.
                 Values.cornerColor = color
-                val colorPanelView = findViewById<View>(R.id.tagColorPreview) as ColorPanelView
-                colorPanelView.color = color
+                tagColorPreview.color = color
                 CornerService.setColor(Values.cornerColor)
             }
         }
@@ -246,7 +303,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     override fun onPause() {
         super.onPause()
-        Persist.saveCornerSize(this, Values.size)
+        Persist.saveCornerSizes(this, Values.sizes)
         Persist.saveToggleState(this, Values.toggleState)
         Persist.saveIndivdualState(this, Values.cornerStates[0], Values.cornerStates[1], Values.cornerStates[2], Values.cornerStates[3])
         Persist.saveCornerColor(this, Values.cornerColor)
@@ -254,7 +311,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
     }
 
     companion object {
-        val DIALOG_ID = 0
+        const val DIALOG_ID = 0
+        const val REQUEST_CODE: Int = 34387
 
         fun setIndividualVisibility() {
             if (CornerService.mView != null) {

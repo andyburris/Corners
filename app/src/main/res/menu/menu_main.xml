@@ -1,8 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.andb.apps.corners.MainActivity">
     <item
-        android:id="@+id/tutorial_from_menu"
-        android:title="@string/notification_hide_title" />
+        android:id="@+id/menuItemHelp"
+        android:title="@string/menu_item_help" />
 </menu>

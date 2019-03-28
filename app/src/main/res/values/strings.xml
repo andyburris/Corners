@@ -1,22 +1,32 @@
 <resources>
-    <!--<string name="app_name">Corners</string>-->
-    <string name="action_settings">Settings</string>
+
+    <!--Interface-->
     <string name="size_setting">Size</string>
     <string name="overlay_toggle">Overlay</string>
-    <string name="notification_title">Corner Overlay</string>
-    <string name="notification_text">Corner is overlaying. You might want to hide this notification by long pressing.</string>
-    <string name="notification_hide_title">Hide Notification</string>
-    <string name="notification_hide_text">To ensure the service won\'t be killed when memory is low, a notification needs to be shown.
+    <string name="corner_color_string">Corner Color </string>
+    <string name="advanced_toggle_title">More Settings</string>
+    <string name="bottom_right_toggle">Bottom Right</string>
+    <string name="top_right_toggle">Top Right</string>
+    <string name="bottom_left_toggle">Bottom Left</string>
+    <string name="top_left_toggle">Top Left</string>
+
+    <!--Notification-->
+    <string name="notification_title">Corners Overlay</string>
+    <string name="notification_text">Corners is overlaying. You might want to hide this notification by long pressing.</string>
+
+    <!--Help-->
+    <string name="menu_item_help">Help</string>
+    <string name="help_notification_hide_title">Hide Notification</string>
+    <string name="help_notification_hide_text">To ensure the service won\'t be killed when memory is low, a notification needs to be shown.
         However, since this is the app\'s only notification, you can hide it and it will achieve the same effect as having none at all.
         You can do this by long pressing on the notification and toggling the switch. You can always reshow it by going to the app\'s settings.
         You can show this tutorial again in the overflow menu.</string>
+    <string name="help_custom_corner_title">Individual Sizes</string>
+    <string name="help_custom_corner_text">To set custom sizes for each corner, long press on the corner under \"more\" settings.</string>
+    <string name="dialog_ok">OK</string>
+
+    <!--Other-->
     <string name="permission_service_sync_error_text">Corners: the overlay permission is not granted but you have the service turned on.
         Please either turn off the service or grant the permission</string>
-    <string name="notification_hide_kill">OK</string>
-    <string name="individual_toggle_title">Individual Corners</string>
-    <string name="individual_overflow">Individual Corners</string>
-    <string name="corner_color_string">Corner Color </string>
-    <string name="advanced_toggle_title">More Settings</string>
-
 
 </resources>

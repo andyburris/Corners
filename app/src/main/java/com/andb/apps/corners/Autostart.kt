@@ -10,7 +10,7 @@ class Autostart : BroadcastReceiver() {
 
     override fun onReceive(context: Context, arg1: Intent) {
 
-        Values.size = Persist.getSavedCornerSize(context)
+        Values.sizes = Persist.getIndividualSizes(context)
         //TODO: Initialize corner states and color
 
         if (Persist.getSavedToggleState(context)) {

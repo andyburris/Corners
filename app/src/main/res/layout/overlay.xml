@@ -12,7 +12,7 @@
         android:rotation="270"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/ic_artboard_1" />
+        android:background="@drawable/ic_top_left" />
 
     <TextView
         android:id="@+id/bottomRight"
@@ -21,7 +21,7 @@
         android:rotation="180"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/ic_artboard_1" />
+        android:background="@drawable/ic_top_left" />
 
     <TextView
         android:id="@+id/topLeft"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_artboard_1" />
+        android:background="@drawable/ic_top_left" />
 
     <TextView
         android:id="@+id/topRight"
@@ -38,7 +38,7 @@
         android:rotation="90"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_artboard_1" />
+        android:background="@drawable/ic_top_left" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
