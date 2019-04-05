@@ -8,21 +8,28 @@ import android.util.Log
 
 class Autostart : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, arg1: Intent) {
+    override fun onReceive(context: Context, intent: Intent) {
 
-        Values.sizes = Persist.getIndividualSizes(context)
-        //TODO: Initialize corner states and color
 
-        if (Persist.getSavedToggleState(context)) {
+        when(intent.action){
+            Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED->{
+                Values.sizes = Persist.getIndividualSizes()
+                Values.cornerStates = Persist.getIndividualState()
+                Values.cornerColor = Persist.getSavedCornerColor()
 
-            val intent = Intent(context, CornerService::class.java)
+                if (Persist.getSavedToggleState()) {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+                    val serviceIntent = Intent(context, CornerService::class.java)
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(serviceIntent)
+                    } else {
+                        context.startService(serviceIntent)
+                    }
+                    Log.i("Autostart", "started")
+                }
             }
-            Log.i("Autostart", "started")
         }
+
     }
 }

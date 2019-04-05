@@ -3,6 +3,7 @@ package com.andb.apps.corners
 import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.net.Uri
@@ -15,7 +16,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.transition.ChangeBounds
@@ -23,24 +23,32 @@ import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.dialog_custom_value.view.*
+import kotlinx.android.synthetic.main.overlay.view.*
 import java.util.*
 
 class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     var individualCollapse = true
+    val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener{prefs, key->
+        when(key){
+            "toggle_state"-> overlay_toggle.isChecked = prefs.getBoolean(key, false)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Persist.init(this)
         setContentView(R.layout.activity_main)
         loadValues()
         setupWindow()
         setupContent()
+        setupTile()
     }
 
     private fun setupWindow() {
-        val toolbar = findViewById<View>(R.id.toolbar) as androidx.appcompat.widget.Toolbar
         setSupportActionBar(toolbar)
         toolbar.setTitleTextColor(Color.BLACK)
         toolbar.overflowIcon?.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP)
@@ -56,11 +64,11 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     private fun loadValues() {
         checkDrawOverlayPermission()
-        Values.sizes = Persist.getIndividualSizes(this)
-        Values.toggleState = Persist.getSavedToggleState(this)
-        Values.cornerStates = Persist.getIndividualState(this)
-        Values.cornerColor = Persist.getSavedCornerColor(this)
-        Values.firstRun = Persist.getSavedFirstRun(this)
+        Values.sizes = Persist.getIndividualSizes()
+        Values.toggleState = Persist.getSavedToggleState()
+        Values.cornerStates = Persist.getIndividualState()
+        Values.cornerColor = Persist.getSavedCornerColor()
+        Values.firstRun = Persist.getSavedFirstRun()
     }
 
     private fun setupContent() {
@@ -73,6 +81,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 Values.sizes = Values.listFromSize(progress)
                 updateService()
+                save(ToSave.SIZES)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -86,28 +95,29 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         overlay_toggle.setOnCheckedChangeListener { _, isChecked ->
             val serviceIntent = Intent(this, CornerService::class.java)
             Values.toggleState = isChecked
-            when (isChecked) {
-                true -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (Settings.canDrawOverlays(this)) {
-                            Log.d("serviceStart", "service started")
-                            startService(serviceIntent)
-                            if (Values.firstRun) {
-                                showHelp()
-                                Values.firstRun = false
-                            }
-                        } else {
-                            checkDrawOverlayPermission()
-                            overlay_toggle.isChecked = false
+            if (isChecked) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Settings.canDrawOverlays(this)) {
+                        Log.d("serviceStart", "service started")
+                        startService(serviceIntent)
+                        if (Values.firstRun) {
+                            showHelp()
+                            Values.firstRun = false
                         }
                     } else {
-                        startService(serviceIntent)
+                        checkDrawOverlayPermission()
+                        overlay_toggle.isChecked = false
                     }
+                } else {
+                    startService(serviceIntent)
                 }
-                false -> {
-                    stopService(serviceIntent)
-                }
+            } else {
+                stopService(serviceIntent)
             }
+            save(ToSave.TOGGLE)
+
+
         }
 
 
@@ -164,18 +174,22 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         switchTopL.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[0] = isChecked
             setIndividualVisibility()
+            save(ToSave.INDIVIDUAL_STATE)
         }
         switchTopR.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[1] = isChecked
             setIndividualVisibility()
+            save(ToSave.INDIVIDUAL_STATE)
         }
         switchBottomL.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[2] = isChecked
             setIndividualVisibility()
+            save(ToSave.INDIVIDUAL_STATE)
         }
         switchBottomR.setOnCheckedChangeListener { _, isChecked ->
             Values.cornerStates[3] = isChecked
             setIndividualVisibility()
+            save(ToSave.INDIVIDUAL_STATE)
         }
 
         sizeDialog(switchTopL, 0)
@@ -202,6 +216,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                     }
                     Log.d("newSizes", Values.sizes.toString())
                     updateService()
+                    save(ToSave.SIZES)
                     dialog.cancel()
                 }.show()
 
@@ -209,20 +224,23 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         }
     }
 
+    private fun setupTile(){
+        Persist.listen(prefsListener)
+    }
+
     fun updateService() {
-        CornerService.sizes = Values.sizes
         currentVal.text = Values.commonSize().toString()
         seekBar.progress = Values.commonSize()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.canDrawOverlays(this@MainActivity)) {
                 Log.d("change size", "change size")
-                CornerService.setSize(this@MainActivity)
+                CornerService.cornerService?.setSize()
             } else {
                 Toast.makeText(this@MainActivity, "Overlay permission not granted", Toast.LENGTH_SHORT)
                     .show()
             }
         } else {
-            CornerService.setSize(this@MainActivity)
+            CornerService.cornerService?.setSize()
         }
     }
 
@@ -239,15 +257,15 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         val id = item.itemId
 
 
-        when(id){
-            R.id.menuItemHelp->showHelp()
+        when (id) {
+            R.id.menuItemHelp -> showHelp()
         }
 
 
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showHelp(){
+    private fun showHelp() {
         AlertDialog.Builder(this)
             .setView(R.layout.help_dialog)
             .setNegativeButton(R.string.dialog_ok) { dialog, _ ->
@@ -279,7 +297,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         if (requestCode == REQUEST_CODE) {
             /* if so check once again if we have permission */
             if (!Settings.canDrawOverlays(applicationContext)) {
-                Toast.makeText(this, "Overlay permision not granted!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.permission_not_granted, Toast.LENGTH_SHORT).show()
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -292,9 +310,17 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                 // We got result from the dialog that is shown when clicking on the icon in the action bar.
                 Values.cornerColor = color
                 tagColorPreview.color = color
-                CornerService.setColor(Values.cornerColor)
+                CornerService.cornerService?.setColor(Values.cornerColor)
             }
         }
+    }
+
+    fun save(vararg toSave: ToSave){
+        if(toSave.contains(ToSave.TOGGLE) || toSave.isEmpty()) Persist.saveToggleState(Values.toggleState)
+        if(toSave.contains(ToSave.SIZES) || toSave.isEmpty()) Persist.saveCornerSizes(Values.sizes)
+        if(toSave.contains(ToSave.INDIVIDUAL_STATE) || toSave.isEmpty()) Persist.saveIndivdualState(Values.cornerStates[0], Values.cornerStates[1], Values.cornerStates[2], Values.cornerStates[3])
+        if(toSave.contains(ToSave.COLOR) || toSave.isEmpty()) Persist.saveCornerColor(Values.cornerColor)
+        if(toSave.contains(ToSave.TOGGLE) || toSave.isEmpty()) Persist.saveFirstRun(Values.firstRun)
     }
 
     override fun onDialogDismissed(dialogId: Int) {
@@ -303,11 +329,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     override fun onPause() {
         super.onPause()
-        Persist.saveCornerSizes(this, Values.sizes)
-        Persist.saveToggleState(this, Values.toggleState)
-        Persist.saveIndivdualState(this, Values.cornerStates[0], Values.cornerStates[1], Values.cornerStates[2], Values.cornerStates[3])
-        Persist.saveCornerColor(this, Values.cornerColor)
-        Persist.saveFirstRun(this, Values.firstRun)
+        save()
+        Persist.unListen(prefsListener)
     }
 
     companion object {
@@ -315,22 +338,26 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         const val REQUEST_CODE: Int = 34387
 
         fun setIndividualVisibility() {
-            if (CornerService.mView != null) {
-                val topLeft = CornerService.mView!!.findViewById<View>(R.id.topLeft) as TextView
-                val topRight = CornerService.mView!!.findViewById<View>(R.id.topRight) as TextView
-                val bottomLeft = CornerService.mView!!.findViewById<View>(R.id.bottomLeft) as TextView
-                val bottomRight = CornerService.mView!!.findViewById<View>(R.id.bottomRight) as TextView
-
+            CornerService.cornerService?.mView?.apply {
                 val views = ArrayList(Arrays.asList(topLeft, topRight, bottomLeft, bottomRight))
 
                 for (i in views.indices) {
                     if (Values.cornerStates[i]) {
-                        views[i].visibility = View.VISIBLE
+                        views[i]?.visibility = View.VISIBLE
                     } else {
-                        views[i].visibility = View.GONE
+                        views[i]?.visibility = View.GONE
                     }
                 }
             }
+
         }
     }
+
+    enum class ToSave{
+        TOGGLE,
+        SIZES,
+        INDIVIDUAL_STATE,
+        COLOR
+    }
+
 }

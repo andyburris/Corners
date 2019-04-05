@@ -9,6 +9,7 @@
     <string name="top_right_toggle">Top Right</string>
     <string name="bottom_left_toggle">Bottom Left</string>
     <string name="top_left_toggle">Top Left</string>
+    <string name="qs_tile_label">Toggle Overlay</string>
 
     <!--Notification-->
     <string name="notification_title">Corners Overlay</string>
@@ -26,7 +27,9 @@
     <string name="dialog_ok">OK</string>
 
     <!--Other-->
+    <string name="permission_not_granted">Overlay permision not granted!</string>
     <string name="permission_service_sync_error_text">Corners: the overlay permission is not granted but you have the service turned on.
         Please either turn off the service or grant the permission</string>
-
+   <!-- <string name="accessibility_service_description">Allow Corners to overlay the lockscreen and notification bar, as well as detect the current app for app-by-app enabling</string>
+-->
 </resources>

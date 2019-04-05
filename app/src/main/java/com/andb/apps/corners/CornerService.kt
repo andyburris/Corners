@@ -16,14 +16,19 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.TextView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.overlay.view.*
 
+const val NOTIFICATION_ID = 1
+const val channelId = "default_channel_id"
 
 class CornerService : Service() {
 
+    var notifManager: NotificationManager? = null
 
-    private var notifManager: NotificationManager? = null
+    lateinit var mView: View
+    lateinit var windowManager: WindowManager
+    lateinit var params: WindowManager.LayoutParams
 
 
     override fun onBind(intent: Intent): IBinder? {
@@ -32,6 +37,7 @@ class CornerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        cornerService = this
 
         val notification: Notification
 
@@ -57,25 +63,23 @@ class CornerService : Service() {
 
 
             notification = Notification.Builder(this, channelId)
-                    .setContentTitle(getText(R.string.notification_title))
-                    .setContentText(getText(R.string.notification_text))
-                    .setSmallIcon(R.drawable.ic_notif)
-                    .setContentIntent(pendingIntent)
-                    .build()
+                .setContentTitle(getText(R.string.notification_title))
+                .setContentText(getText(R.string.notification_text))
+                .setSmallIcon(R.drawable.ic_notif)
+                .setContentIntent(pendingIntent)
+                .build()
         } else {
             notification = Notification.Builder(this)
-                    .setContentTitle(getText(R.string.notification_title))
-                    .setContentText(getText(R.string.notification_text))
-                    .setContentIntent(pendingIntent)
-                    .build()
+                .setContentTitle(getText(R.string.notification_title))
+                .setContentText(getText(R.string.notification_text))
+                .setContentIntent(pendingIntent)
+                .build()
         }
 
 
         startForeground(NOTIFICATION_ID, notification)
 
         Log.d("serviceStart", "service started")
-
-        sizes = Values.sizes
 
 
         /*WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -92,7 +96,7 @@ class CornerService : Service() {
         val inflater = LayoutInflater.from(this@CornerService)
 
         mView = inflater.inflate(R.layout.overlay, null)
-        setSize(applicationContext)
+        setSize()
         setColor(Values.cornerColor)
 
         val screenSize = getRealScreenSize(this)
@@ -106,7 +110,8 @@ class CornerService : Service() {
             if (Settings.canDrawOverlays(applicationContext)) {
                 startOverlay(height, width)
             } else {
-                Toast.makeText(applicationContext, R.string.permission_service_sync_error_text, Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, R.string.permission_service_sync_error_text, Toast.LENGTH_LONG)
+                    .show()
             }
         } else {
             startOverlay(height, width)
@@ -123,7 +128,8 @@ class CornerService : Service() {
         try {
             windowManager.removeViewImmediate(mView)
         } catch (e: Exception) {
-            Toast.makeText(applicationContext, R.string.permission_service_sync_error_text, Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, R.string.permission_service_sync_error_text, Toast.LENGTH_LONG)
+                .show()
             e.printStackTrace()
         }
 
@@ -155,114 +161,105 @@ class CornerService : Service() {
             e.printStackTrace()
         }
 
+        cornerService = null
+
     }
+
+
+    fun startOverlay(height: Int, width: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            params = WindowManager.LayoutParams(
+                width, height, 0, 0,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+                        or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        or WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                PixelFormat.TRANSLUCENT
+            )
+        } else {
+            params = WindowManager.LayoutParams(
+                width,
+                height, 0, 0, WindowManager.LayoutParams.TYPE_PRIORITY_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+                        or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        or WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                        or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                PixelFormat.TRANSLUCENT
+            )
+        }
+
+        params.gravity = Gravity.TOP or Gravity.START
+        params.x = 0
+        params.y = 0
+
+        windowManager.addView(mView, params)
+
+        MainActivity.setIndividualVisibility()
+        setColor(Values.cornerColor)
+    }
+
+
+    fun getRealScreenSize(context: Context): Point {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display.getRealSize(size)
+        return size
+    }
+
+    fun setSize() {
+        val view = mView
+        if (view != null) {
+            val scale = view.context.resources.displayMetrics.density
+
+            val dpAdjustTopL = (Values.sizes[0] * scale + 0.5f).toInt()
+            val dpAdjustTopR = (Values.sizes[1] * scale + 0.5f).toInt()
+            val dpAdjustBotL = (Values.sizes[2] * scale + 0.5f).toInt()
+            val dpAdjustBotR = (Values.sizes[3] * scale + 0.5f).toInt()
+
+            view.topLeft.width = dpAdjustTopL
+            view.topLeft.height = dpAdjustTopL
+            view.topRight.width = dpAdjustTopR
+            view.topRight.height = dpAdjustTopR
+            view.bottomLeft.width = dpAdjustBotL
+            view.bottomLeft.height = dpAdjustBotL
+            view.bottomRight.width = dpAdjustBotR
+            view.bottomRight.height = dpAdjustBotR
+        }
+
+    }
+
+    fun setColor(color: Int) {
+
+        Log.d("setColor", "setting color: " + Integer.toHexString(color))
+        val view = mView
+        if (view != null) {
+
+            view.topLeft.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            view.topRight.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            view.bottomLeft.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            view.bottomRight.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+
+            Log.d("setColor", "done setting color")
+        }
+
+    }
+
 
     companion object {
-
-        var mView: View? = null
-        lateinit var windowManager: WindowManager
-        lateinit var params: WindowManager.LayoutParams
-
-        var sizes = arrayListOf(12, 12, 12, 12)
-
-        const val NOTIFICATION_ID = 1
-        const val channelId = "default_channel_id"
-
-        fun startOverlay(height: Int, width: Int) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                params = WindowManager.LayoutParams(width, height, 0, 0,
-                        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                                or WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
-                                or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                or WindowManager.LayoutParams.FLAG_FULLSCREEN
-                                or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-                                or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                                or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                                or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                        PixelFormat.TRANSLUCENT)
-            } else {
-                params = WindowManager.LayoutParams(width,
-                        height, 0, 0, WindowManager.LayoutParams.TYPE_PRIORITY_PHONE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                                or WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
-                                or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                                or WindowManager.LayoutParams.FLAG_FULLSCREEN
-                                or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-                                or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                                or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                                or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                        PixelFormat.TRANSLUCENT)
-            }
-
-            params.gravity = Gravity.TOP or Gravity.START
-            params.x = 0
-            params.y = 0
-
-            windowManager.addView(mView, params)
-
-            MainActivity.setIndividualVisibility()
-            setColor(Values.cornerColor)
-        }
-
-
-        fun getRealScreenSize(context: Context): Point {
-            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val display = windowManager.defaultDisplay
-            val size = Point()
-            display.getRealSize(size)
-            return size
-        }
-
-        fun setSize(context: Context) {
-            if (mView != null) {
-                val scale = context.resources.displayMetrics.density
-
-                val dpAdjustTopL = (sizes[0] * scale + 0.5f).toInt()
-                val dpAdjustTopR = (sizes[1] * scale + 0.5f).toInt()
-                val dpAdjustBotL = (sizes[2] * scale + 0.5f).toInt()
-                val dpAdjustBotR = (sizes[3] * scale + 0.5f).toInt()
-
-
-                val topLeft = mView!!.findViewById<TextView>(R.id.topLeft)
-                val topRight = mView!!.findViewById<TextView>(R.id.topRight)
-                val bottomLeft = mView!!.findViewById<TextView>(R.id.bottomLeft)
-                val bottomRight = mView!!.findViewById<TextView>(R.id.bottomRight)
-
-                topLeft.width = dpAdjustTopL
-                topLeft.height = dpAdjustTopL
-                topRight.width = dpAdjustTopR
-                topRight.height = dpAdjustTopR
-                bottomLeft.width = dpAdjustBotL
-                bottomLeft.height = dpAdjustBotL
-                bottomRight.width = dpAdjustBotR
-                bottomRight.height = dpAdjustBotR
-            }
-
-        }
-
-        fun setColor(color: Int) {
-
-            Log.d("setColor", "setting color: " + Integer.toHexString(color))
-            if (mView != null) {
-
-                val topLeft = mView!!.findViewById<TextView>(R.id.topLeft)
-                val topRight = mView!!.findViewById<TextView>(R.id.topRight)
-                val bottomLeft = mView!!.findViewById<TextView>(R.id.bottomLeft)
-                val bottomRight = mView!!.findViewById<TextView>(R.id.bottomRight)
-
-
-                topLeft.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
-                topRight.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
-                bottomLeft.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
-                bottomRight.background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
-
-
-                Log.d("setColor", "done setting color")
-            }
-
-        }
+        var cornerService: CornerService? = null
     }
+
 }
 
 

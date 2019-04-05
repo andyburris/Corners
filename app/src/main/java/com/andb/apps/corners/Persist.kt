@@ -1,17 +1,32 @@
 package com.andb.apps.corners
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 
 object Persist {
 
-    fun saveCornerSizes(ctxt: Context, list: ArrayList<Int>) {
-        saveCornerSizes(ctxt, list[0], list[1], list[2], list[3])
+    lateinit var prefs: SharedPreferences
+    fun init(ctxt: Context){
+        if(!::prefs.isInitialized) {
+            prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
+        }
     }
 
-    fun saveCornerSizes(ctxt: Context, topL: Int, topR: Int, botL: Int, botR: Int) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
+    fun listen(listener: SharedPreferences.OnSharedPreferenceChangeListener){
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun unListen(listener: SharedPreferences.OnSharedPreferenceChangeListener){
+        prefs.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun saveCornerSizes(list: ArrayList<Int>) {
+        saveCornerSizes(list[0], list[1], list[2], list[3])
+    }
+
+    fun saveCornerSizes(topL: Int, topR: Int, botL: Int, botR: Int) {
         val editor = prefs.edit()
         editor.putInt("topLSize", topL)
         editor.putInt("topRSize", topR)
@@ -20,15 +35,14 @@ object Persist {
         editor.apply()
     }
 
-    fun getIndividualSizes(ctxt: Context): ArrayList<Int> {
+    fun getIndividualSizes(): ArrayList<Int> {
         val sizes = ArrayList<Int>()
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
 
         prefs.apply {
-            sizes.add(if (contains("topL")) getInt("topLSize", getOldSavedCornerSize(ctxt)) else DEFAULT_SIZE)
-            sizes.add(if (contains("topR")) getInt("topRSize", getOldSavedCornerSize(ctxt)) else DEFAULT_SIZE)
-            sizes.add(if (contains("botL")) getInt("botLSize", getOldSavedCornerSize(ctxt)) else DEFAULT_SIZE)
-            sizes.add(if (contains("botR")) getInt("botRSize", getOldSavedCornerSize(ctxt)) else DEFAULT_SIZE)
+            sizes.add(if (contains("topL")) getInt("topLSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
+            sizes.add(if (contains("topR")) getInt("topRSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
+            sizes.add(if (contains("botL")) getInt("botLSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
+            sizes.add(if (contains("botR")) getInt("botRSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
         }
 
         Log.d("loadSizes", "sizes.size = ${sizes.size}")
@@ -36,8 +50,7 @@ object Persist {
         return sizes
     }
 
-    fun getOldSavedCornerSize(ctxt: Context): Int {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
+    fun getOldSavedCornerSize(): Int {
         return if (prefs.contains("corner_size")) {
             prefs.getInt("corner_size", DEFAULT_SIZE)
         } else {
@@ -45,25 +58,22 @@ object Persist {
         }
     }
 
-    internal fun saveToggleState(ctxt: Context, toggleState: Boolean) {
+    internal fun saveToggleState(toggleState: Boolean) {
         Log.d("saveToggle", "Saving as " + java.lang.Boolean.toString(toggleState))
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
         val editor = prefs.edit()
         editor.putBoolean("toggle_state", toggleState)
         editor.apply()
     }
 
-    fun getSavedToggleState(ctxt: Context): Boolean {
+    fun getSavedToggleState(): Boolean {
         Log.d("saveToggle", "Loading toggle state")
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
         return if (prefs.contains("toggle_state"))
             prefs.getBoolean("toggle_state", true)
         else
             false
     }
 
-    internal fun saveIndivdualState(ctxt: Context, topL: Boolean, topR: Boolean, botL: Boolean, botR: Boolean) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
+    internal fun saveIndivdualState(topL: Boolean, topR: Boolean, botL: Boolean, botR: Boolean) {
         val editor = prefs.edit()
 
         editor.putBoolean("topL", topL)
@@ -76,9 +86,8 @@ object Persist {
 
     }
 
-    fun getIndividualState(ctxt: Context): ArrayList<Boolean> {
+    fun getIndividualState(): ArrayList<Boolean> {
         val cornerStates = ArrayList<Boolean>()
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
         cornerStates.add(if (prefs.contains("topL")) prefs.getBoolean("topL", true) else DEFAULT_TOGGLE)
         cornerStates.add(if (prefs.contains("topR")) prefs.getBoolean("topR", true) else DEFAULT_TOGGLE)
         cornerStates.add(if (prefs.contains("botL")) prefs.getBoolean("botL", true) else DEFAULT_TOGGLE)
@@ -86,31 +95,27 @@ object Persist {
         return cornerStates
     }
 
-    internal fun saveCornerColor(ctxt: Context, cornerColor: Int) {
+    internal fun saveCornerColor(cornerColor: Int) {
         Log.d("saveColor", "Saving as " + Integer.toHexString(cornerColor))
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
         val editor = prefs.edit()
         editor.putInt("corner_color", cornerColor)
         editor.apply()
     }
 
-    fun getSavedCornerColor(ctxt: Context): Int {
+    fun getSavedCornerColor(): Int {
         Log.d("loadColor", "Loading color")
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
         return if (prefs.contains("corner_color"))
             prefs.getInt("corner_color", -16777216)
         else
             -16777216
     }
 
-    fun saveFirstRun(ctxt: Context, firstRun: Boolean){
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
+    fun saveFirstRun(firstRun: Boolean){
         val editor = prefs.edit()
         editor.putBoolean("first_run", firstRun)
         editor.apply()
     }
-    fun getSavedFirstRun(ctxt: Context): Boolean{
-        val prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
+    fun getSavedFirstRun(): Boolean{
         return if (prefs.contains("first_run"))
             prefs.getBoolean("first_run", true)
         else
