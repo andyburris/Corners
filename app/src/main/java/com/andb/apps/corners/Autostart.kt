@@ -13,6 +13,9 @@ class Autostart : BroadcastReceiver() {
 
         when(intent.action){
             Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED->{
+
+                Persist.init(context)
+
                 Values.sizes = Persist.getIndividualSizes()
                 Values.cornerStates = Persist.getIndividualState()
                 Values.cornerColor = Persist.getSavedCornerColor()

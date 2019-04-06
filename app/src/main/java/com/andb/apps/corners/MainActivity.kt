@@ -216,6 +216,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                     }
                     Log.d("newSizes", Values.sizes.toString())
                     updateService()
+                    seekBar.progress = Values.commonSize()
                     save(ToSave.SIZES)
                     dialog.cancel()
                 }.show()
@@ -230,7 +231,6 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     fun updateService() {
         currentVal.text = Values.commonSize().toString()
-        seekBar.progress = Values.commonSize()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.canDrawOverlays(this@MainActivity)) {
                 Log.d("change size", "change size")
