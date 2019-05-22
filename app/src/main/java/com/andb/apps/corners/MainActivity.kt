@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentTransaction
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
@@ -32,9 +33,9 @@ import java.util.*
 class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
     var individualCollapse = true
-    val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener{prefs, key->
-        when(key){
-            "toggle_state"-> overlay_toggle.isChecked = prefs.getBoolean(key, false)
+    val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+        when (key) {
+            "toggle_state" -> overlay_toggle.isChecked = prefs.getBoolean(key, false)
         }
     }
 
@@ -225,7 +226,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         }
     }
 
-    private fun setupTile(){
+    private fun setupTile() {
         Persist.listen(prefsListener)
     }
 
@@ -254,11 +255,9 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-
-        when (id) {
+        when (item.itemId) {
             R.id.menuItemHelp -> showHelp()
+            R.id.menuItemAbout -> showAbout()
         }
 
 
@@ -273,6 +272,25 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
             }
             .create()
             .show()
+    }
+
+    private fun showAbout() {
+        supportFragmentManager.beginTransaction().add(R.id.aboutFragmentHolder, About(), "aboutScreen").addToBackStack("aboutScreen")
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit()
+        aboutFragmentHolder.animate().alpha(1f)
+        toolbar.setTitle(R.string.menu_item_about)
+        toolbar.menu.setGroupVisible(R.id.main_menu_group, false)
+    }
+
+    private fun hideAbout(): Boolean{
+        if(supportFragmentManager.backStackEntryCount>0){
+            supportFragmentManager.popBackStack()
+            aboutFragmentHolder.animate().alpha(0f)
+            toolbar.setTitle(R.string.app_name)
+            toolbar.menu.setGroupVisible(R.id.main_menu_group, true)
+            return true
+        }
+        return false
     }
 
     //Request screenOverlay permission
@@ -315,16 +333,23 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         }
     }
 
-    fun save(vararg toSave: ToSave){
-        if(toSave.contains(ToSave.TOGGLE) || toSave.isEmpty()) Persist.saveToggleState(Values.toggleState)
-        if(toSave.contains(ToSave.SIZES) || toSave.isEmpty()) Persist.saveCornerSizes(Values.sizes)
-        if(toSave.contains(ToSave.INDIVIDUAL_STATE) || toSave.isEmpty()) Persist.saveIndivdualState(Values.cornerStates[0], Values.cornerStates[1], Values.cornerStates[2], Values.cornerStates[3])
-        if(toSave.contains(ToSave.COLOR) || toSave.isEmpty()) Persist.saveCornerColor(Values.cornerColor)
-        if(toSave.contains(ToSave.TOGGLE) || toSave.isEmpty()) Persist.saveFirstRun(Values.firstRun)
+    fun save(vararg toSave: ToSave) {
+        if (toSave.contains(ToSave.TOGGLE) || toSave.isEmpty()) Persist.saveToggleState(Values.toggleState)
+        if (toSave.contains(ToSave.SIZES) || toSave.isEmpty()) Persist.saveCornerSizes(Values.sizes)
+        if (toSave.contains(ToSave.INDIVIDUAL_STATE) || toSave.isEmpty()) Persist.saveIndivdualState(Values.cornerStates[0], Values.cornerStates[1], Values.cornerStates[2], Values.cornerStates[3])
+        if (toSave.contains(ToSave.COLOR) || toSave.isEmpty()) Persist.saveCornerColor(Values.cornerColor)
+        if (toSave.contains(ToSave.TOGGLE) || toSave.isEmpty()) Persist.saveFirstRun(Values.firstRun)
     }
 
     override fun onDialogDismissed(dialogId: Int) {
 
+    }
+
+    override fun onBackPressed() {
+        val close = !hideAbout()
+        when {
+            close -> super.onBackPressed()
+        }
     }
 
     override fun onPause() {
@@ -353,7 +378,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         }
     }
 
-    enum class ToSave{
+    enum class ToSave {
         TOGGLE,
         SIZES,
         INDIVIDUAL_STATE,

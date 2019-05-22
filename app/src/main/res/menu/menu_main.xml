@@ -1,7 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.andb.apps.corners.MainActivity">
-    <item
-        android:id="@+id/menuItemHelp"
-        android:title="@string/menu_item_help" />
+    <group android:id="@+id/main_menu_group">
+        <item
+            android:id="@+id/menuItemHelp"
+            android:title="@string/menu_item_help" />
+        <item
+            android:id="@+id/menuItemAbout"
+            android:title="@string/menu_item_about"/>
+    </group>
+
 </menu>

@@ -4,8 +4,12 @@
     package="com.andb.apps.corners">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+<!--
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+-->
+<!--
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+-->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -38,7 +42,7 @@
 
     </service>
         <service android:name=".QuickSettings"
-            android:icon="@drawable/ic_notif"
+            android:icon="@drawable/app_icon_foreground"
             android:label="@string/qs_tile_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>

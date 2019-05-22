@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<resources>
+    <!--Interface-->
+    <string name="size_setting">Размер</string>
+    <string name="overlay_toggle">Слой</string>
+    <string name="corner_color_string">Цвят на ъглите</string>
+    <string name="advanced_toggle_title">Още Настройки</string>
+    <string name="bottom_right_toggle">Долу Вдясно</string>
+    <string name="top_right_toggle">Горе Вдясно</string>
+    <string name="bottom_left_toggle">Долу Вляво</string>
+    <string name="top_left_toggle">Горе Вляво</string>
+    <string name="qs_tile_label">Включи заоблените ъгли</string>
+    <!--Notification-->
+    <string name="notification_title">Слой на ъглите</string>
+    <string name="notification_text">Слоят с ъглите е включен. Може би ще искате да скриете това известие като задържите върху него.</string>
+    <!--Help-->
+    <string name="menu_item_help">Помощ</string>
+    <string name="help_notification_hide_title">Скрийте Известието</string>
+    <string name="help_notification_hide_text">За да бъдете сигурни, че услугата няма да бъде спряна от операционната система, трябва да да се показва едно известие.
+Обаче, защото това е единственото известие от приложението, вие ще можете да го скриете.
+Задръжте върху известието и го изключете. Винаги можете да го включите отново в настройките на устройството Ви.
+Можете да изгледате упътването отново в менюто за Помощ.</string>
+    <string name="help_custom_corner_title">Индивидуални Размери</string>
+    <string name="help_custom_corner_text">За да зададете различни размери на всеки ъгъл, задръжте на ъгъла в менюто \"Още Настройки\"</string>
+    <string name="dialog_ok">ОК</string>
+    <!--About-->
+    <string name="menu_item_about">За нас</string>
+    <string name="about_version">Версия</string>
+    <string name="about_licences">Лицензи</string>
+    <string name="about_translations_title">Преводачи</string>
+    <string name="about_translations_desc">Благодарение на:</string>
+    <!--Other-->
+    <string name="permission_not_granted">Не е разрешен достъп за показване отгоре!</string>
+    <string name="permission_service_sync_error_text">Corners: не е разрешено на приложението да се показва отгоре, но услугата е включена.
+Молим ви да изключите услугата или да ѝ дадете права.</string>
+    <!-- 
+    <string name="accessibility_service_description">Allow Corners to overlay the lockscreen and notification bar, as well as detect the current app for app-by-app enabling</string>
+-->
+    <string name="action_settings">Настройки</string>
+    <string name="notification_hide_title">Скрий Известието</string>
+    <string name="notification_hide_text">За да бъдете сигурни, че приложението няма да се затвори от системата, трябва да ви излиза едно известие.
+Обаче поради факта, че това е единственото известие на приложението, вие ще можете да го скриете и ще изглежда така, че все едно го няма.
+Можете да направите това като задържите върху известието и да цъкнете бутона отдясно. Винаги можете пак да го включите в настройките на устройството.
+Можете да повторите това отпътуване отново, като отидете в менюто за помощ.</string>
+    <string name="notification_hide_kill">ОК</string>
+    <string name="individual_toggle_title">Индивидуални Ъгли</string>
+    <string name="individual_overflow">Индивидуални Ъгли</string>
+</resources>

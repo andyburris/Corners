@@ -27,4 +27,14 @@
         android:layout_marginTop="?attr/actionBarSize" />
 
 
+    <FrameLayout
+        android:id="@+id/aboutFragmentHolder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/design_default_color_background"
+        android:alpha="0.0"
+        android:layout_marginTop="?attr/actionBarSize" />
+
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

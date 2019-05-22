@@ -65,7 +65,7 @@ class CornerService : Service() {
             notification = Notification.Builder(this, channelId)
                 .setContentTitle(getText(R.string.notification_title))
                 .setContentText(getText(R.string.notification_text))
-                .setSmallIcon(R.drawable.ic_notif)
+                .setSmallIcon(R.drawable.app_icon_foreground)
                 .setContentIntent(pendingIntent)
                 .build()
         } else {

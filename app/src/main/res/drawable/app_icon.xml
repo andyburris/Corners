@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item>
+        <shape android:shape="rectangle">
+            <size android:height="56dp" android:width="56dp"/>
+            <solid android:color="@color/ic_launcher_background"/>
+            <corners android:radius="8dp"/>
+        </shape>
+    </item>
+    <item android:drawable="@drawable/app_icon_foreground" android:top="8dp" android:bottom="8dp" android:left="8dp" android:right="8dp">
+        <color android:color="@android:color/white"/>
+    </item>
+</layer-list>
