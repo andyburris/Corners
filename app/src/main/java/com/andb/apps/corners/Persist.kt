@@ -5,60 +5,74 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 
+
 object Persist {
+    val cornerNames = listOf("topL", "topR", "botL", "botR")
 
     lateinit var prefs: SharedPreferences
-    fun init(ctxt: Context){
-        if(!::prefs.isInitialized) {
+
+    fun init(ctxt: Context) {
+        if (!::prefs.isInitialized) {
             prefs = PreferenceManager.getDefaultSharedPreferences(ctxt)
         }
     }
 
-    fun listen(listener: SharedPreferences.OnSharedPreferenceChangeListener){
+    fun listen(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    fun unListen(listener: SharedPreferences.OnSharedPreferenceChangeListener){
+    fun unListen(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
-    fun saveCornerSizes(list: ArrayList<Int>) {
-        saveCornerSizes(list[0], list[1], list[2], list[3])
-    }
-
-    fun saveCornerSizes(topL: Int, topR: Int, botL: Int, botR: Int) {
+    fun saveCorners(list: List<Corner>) {
+        val cornerPairs = list.take(4).mapIndexed { i, corner -> Pair(corner, cornerNames[i]) }
         val editor = prefs.edit()
-        editor.putInt("topLSize", topL)
-        editor.putInt("topRSize", topR)
-        editor.putInt("botLSize", botL)
-        editor.putInt("botRSize", botR)
-        editor.apply()
-    }
-
-    fun getIndividualSizes(): ArrayList<Int> {
-        val sizes = ArrayList<Int>()
-
-        prefs.apply {
-            sizes.add(if (contains("topL")) getInt("topLSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
-            sizes.add(if (contains("topR")) getInt("topRSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
-            sizes.add(if (contains("botL")) getInt("botLSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
-            sizes.add(if (contains("botR")) getInt("botRSize", getOldSavedCornerSize()) else DEFAULT_SIZE)
+        cornerPairs.forEachFlat { corner, name ->
+            editor.putInt("${name}Size", corner.size)
+            editor.putBoolean("${name}State", corner.visible)
+            editor.putInt("${name}Color", corner.color)
+            editor.apply()
         }
 
-        Log.d("loadSizes", "sizes.size = ${sizes.size}")
-
-        return sizes
     }
 
-    fun getOldSavedCornerSize(): Int {
-        return if (prefs.contains("corner_size")) {
-            prefs.getInt("corner_size", DEFAULT_SIZE)
-        } else {
-            DEFAULT_SIZE
+    fun getCorners(): ArrayList<Corner> {
+        val corners = ArrayList<Corner>()
+        for (i in 0 until 4) {
+            val name = cornerNames[i]
+            val corner = with(prefs) {
+                val size = getInt("${name}Size", getOldSavedCornerSize(i))
+                val visible = getBoolean("${name}State", getOldCornerState(i))
+                val color = getInt("${name}Color", getOldColor())
+                Corner(size, visible, color)
+            }
+            corners.add(corner)
+        }
+        return corners
+    }
+
+
+    private fun getOldSavedCornerSize(i: Int): Int {
+        return when {
+            prefs.contains("corner_size") -> prefs.getInt("corner_size", DEFAULT_SIZE)
+            else -> DEFAULT_SIZE
         }
     }
 
-    internal fun saveToggleState(toggleState: Boolean) {
+
+    fun getOldCornerState(i: Int): Boolean {
+        val name = cornerNames[i]
+        return prefs.getBoolean(name, DEFAULT_TOGGLE)
+    }
+
+
+    fun getOldColor(): Int {
+        Log.d("loadColor", "Loading color")
+        return prefs.getInt("corner_color", -16777216)
+    }
+
+    fun saveToggleState(toggleState: Boolean) {
         Log.d("saveToggle", "Saving as " + java.lang.Boolean.toString(toggleState))
         val editor = prefs.edit()
         editor.putBoolean("toggle_state", toggleState)
@@ -73,49 +87,13 @@ object Persist {
             false
     }
 
-    internal fun saveIndivdualState(topL: Boolean, topR: Boolean, botL: Boolean, botR: Boolean) {
-        val editor = prefs.edit()
-
-        editor.putBoolean("topL", topL)
-        editor.putBoolean("topR", topR)
-        editor.putBoolean("botL", botL)
-        editor.putBoolean("botR", botR)
-
-
-        editor.apply()
-
-    }
-
-    fun getIndividualState(): ArrayList<Boolean> {
-        val cornerStates = ArrayList<Boolean>()
-        cornerStates.add(if (prefs.contains("topL")) prefs.getBoolean("topL", true) else DEFAULT_TOGGLE)
-        cornerStates.add(if (prefs.contains("topR")) prefs.getBoolean("topR", true) else DEFAULT_TOGGLE)
-        cornerStates.add(if (prefs.contains("botL")) prefs.getBoolean("botL", true) else DEFAULT_TOGGLE)
-        cornerStates.add(if (prefs.contains("botR")) prefs.getBoolean("botR", true) else DEFAULT_TOGGLE)
-        return cornerStates
-    }
-
-    internal fun saveCornerColor(cornerColor: Int) {
-        Log.d("saveColor", "Saving as " + Integer.toHexString(cornerColor))
-        val editor = prefs.edit()
-        editor.putInt("corner_color", cornerColor)
-        editor.apply()
-    }
-
-    fun getSavedCornerColor(): Int {
-        Log.d("loadColor", "Loading color")
-        return if (prefs.contains("corner_color"))
-            prefs.getInt("corner_color", -16777216)
-        else
-            -16777216
-    }
-
-    fun saveFirstRun(firstRun: Boolean){
+    fun saveFirstRun(firstRun: Boolean) {
         val editor = prefs.edit()
         editor.putBoolean("first_run", firstRun)
         editor.apply()
     }
-    fun getSavedFirstRun(): Boolean{
+
+    fun getSavedFirstRun(): Boolean {
         return if (prefs.contains("first_run"))
             prefs.getBoolean("first_run", true)
         else

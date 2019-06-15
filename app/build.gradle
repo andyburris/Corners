@@ -8,8 +8,8 @@ android {
         applicationId "com.andb.apps.corners"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 20
-        versionName "1.2.2"
+        versionCode 21
+        versionName "1.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "app_name", "Corners"
     }
@@ -40,7 +40,9 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'//show gif of hiding notification
     implementation 'com.github.daniel-stoneuk:material-about-library:2.4.2'//about app library
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.jaredrummler:colorpicker:1.1.0'//color picker library
+    implementation 'com.afollestad.material-dialogs:core:3.0.0-rc3'//dialog library
+    implementation 'com.afollestad.material-dialogs:color:3.0.0-rc3'//color picker dialog
+    implementation 'com.afollestad.material-dialogs:bottomsheets:3.0.0-rc3'//bottom sheet dialogs
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }

@@ -21,7 +21,7 @@
         You can do this by long pressing on the notification and toggling the switch. You can always reshow it by going to the app\'s settings.
         You can show this tutorial again in the overflow menu.</string>
     <string name="help_custom_corner_title">Individual Sizes</string>
-    <string name="help_custom_corner_text">To set custom sizes for each corner, long press on the corner under \"more\" settings.</string>
+    <string name="help_custom_corner_text">To set custom sizes for each corner, long press on the corner under More Settings.</string>
     <string name="dialog_ok">OK</string>
     <!--About-->
     <string name="menu_item_about">About</string>

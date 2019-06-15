@@ -16,9 +16,7 @@ class Autostart : BroadcastReceiver() {
 
                 Persist.init(context)
 
-                Values.sizes = Persist.getIndividualSizes()
-                Values.cornerStates = Persist.getIndividualState()
-                Values.cornerColor = Persist.getSavedCornerColor()
+                Values.corners = Persist.getCorners()
 
                 if (Persist.getSavedToggleState()) {
 

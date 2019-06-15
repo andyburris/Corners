@@ -29,6 +29,7 @@ class QuickSettings : TileService() {
             } else {
                 stopService(serviceIntent)
             }
+            Persist.init(applicationContext)
             Persist.saveToggleState(Values.toggleState)
             update()
         }else{

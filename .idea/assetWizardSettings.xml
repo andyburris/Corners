@@ -158,7 +158,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/D:/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_crop_free_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/D:/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_brightness_1_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -168,7 +168,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="app_icon_foreground_black_24dp" />
+                            <entry key="outputName" value="ic_dot_black_24dp" />
                             <entry key="sourceFile" value="D:\Documents\Illustrator\Phone\Apps\Resources\Corners\SVG\Top Right.svg" />
                           </map>
                         </option>

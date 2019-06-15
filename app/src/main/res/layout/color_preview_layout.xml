@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/colorPreviewLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/colorPreviewTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:text="@string/corner_color_string"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <!--
+    <FrameLayout
+        android:id="@+id/colorPreviewHolder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0">
+
+        <ImageView
+            android:id="@+id/colorPreviewOutline"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:srcCompat="@drawable/ic_dot_black_24dp" />
+
+        <ImageView
+            android:id="@+id/colorPreview"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:tint="#FFFF0000"
+            app:srcCompat="@drawable/ic_dot_black_24dp" />
+    </FrameLayout>
+-->
+
+    <com.andb.apps.corners.views.ColorView
+        android:id="@+id/colorPreview"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+</LinearLayout>
