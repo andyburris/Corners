@@ -7,10 +7,8 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Point
-import android.graphics.PorterDuff
 import android.util.Log
 import android.view.WindowManager
-import android.widget.ImageView
 
 fun getNavigationBarSize(context: Context): Point {
     val appUsableSize = getAppUsableScreenSize(context)
@@ -63,10 +61,6 @@ fun <A, B> List<Pair<A, B>>.forEachFlat(action: (first: A, second: B) -> Unit) {
     this.forEach {
         action.invoke(it.first, it.second)
     }
-}
-
-fun ImageView.setColor(color: Int){
-    this.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
 }
 
 fun dpToPx(dp: Int): Int {

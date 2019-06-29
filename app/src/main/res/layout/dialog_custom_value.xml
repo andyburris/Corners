@@ -3,21 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:theme="@style/AppTheme.TextInputLayout">
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:id="@+id/customSizeInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/size_setting"
-        app:boxStrokeColor="@color/colorAccent"
-        app:boxStrokeWidth="2dp"
         app:endIconMode="none"
         app:hintAnimationEnabled="true"
-        app:hintEnabled="true"
-        app:hintTextColor="@color/colorAccent">
+        app:hintEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/customSizeEditText"

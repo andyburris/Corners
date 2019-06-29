@@ -10,7 +10,7 @@
         android:id="@+id/hideTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/help_notification_hide_title"
+        android:text="@string/notification_hide_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@android:color/black"
         android:textSize="18sp"
@@ -28,14 +28,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
-        android:text="@string/help_notification_hide_text" />
+        android:text="@string/notification_hide_text" />
 
     <TextView
         android:id="@+id/customTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/help_custom_corner_title"
+        android:text="@string/individual_corners"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@android:color/black"
         android:textSize="18sp"

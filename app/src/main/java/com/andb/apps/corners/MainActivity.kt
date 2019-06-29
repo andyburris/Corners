@@ -1,5 +1,6 @@
 package com.andb.apps.corners
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Intent
 import android.content.SharedPreferences
@@ -17,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentTransaction
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
@@ -56,12 +58,12 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.setTitleTextColor(Color.BLACK)
         toolbar.overflowIcon?.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP)
-        window.navigationBarColor = resources.getColor(R.color.colorAccent)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.colorAccent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         } else {
-            window.statusBarColor = resources.getColor(R.color.colorAccent)
+            window.statusBarColor = ContextCompat.getColor(this, R.color.colorAccent)
         }
 
     }
@@ -81,11 +83,15 @@ class MainActivity : AppCompatActivity() {
 
         sizeBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                Values.corners.forEach {
-                    it.size = progress
+
+                if (fromUser) {
+                    Values.corners.forEach {
+                        it.size = progress
+                    }
+                    updateService()
+                    save()
                 }
-                updateService()
-                save()
+
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -105,6 +111,7 @@ class MainActivity : AppCompatActivity() {
                         if (Values.firstRun) {
                             showHelp()
                             Values.firstRun = false
+                            Persist.saveFirstRun(Values.firstRun)
                         }
                     } else {
                         checkDrawOverlayPermission()
@@ -120,26 +127,17 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        val scale = resources.displayMetrics.density
-        val pixels = (52 * scale + 0.5f).toInt()
+        val pixels = dpToPx(52)
         val params = individual_card.layoutParams
         params.height = pixels
         collapseToggleSpace.setOnClickListener {
+            TransitionManager.beginDelayedTransition(individual_card, TransitionSet().addTransition(ChangeBounds()))
             if (moreCollapse) {
-
-                TransitionManager.beginDelayedTransition(
-                    individual_card, TransitionSet().addTransition(ChangeBounds())
-                )
                 params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 individual_card.layoutParams = params
 
                 collapseButton.animate().setDuration(100).rotation(0f)
-
             } else {
-                TransitionManager.beginDelayedTransition(
-                    individual_card, TransitionSet()
-                        .addTransition(ChangeBounds())
-                )
                 params.height = pixels
                 individual_card.layoutParams = params
                 collapseButton.animate().setDuration(100).rotation(180f)
@@ -162,7 +160,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun setupIndividual() {
+    private fun setupIndividual() {
         switchTopL.isChecked = Values.corners[0].visible
         switchTopR.isChecked = Values.corners[1].visible
         switchBottomL.isChecked = Values.corners[2].visible
@@ -196,7 +194,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun sizeDialog(index: Int) {
+    @SuppressLint("InflateParams")//alert dialog
+    private fun sizeDialog(index: Int) {
 
         val specific = index != -1
         val currentSize = if (specific) Values.corners[index].size else Values.commonSize()
@@ -205,7 +204,7 @@ class MainActivity : AppCompatActivity() {
             1 -> getString(R.string.top_right_toggle)
             2 -> getString(R.string.bottom_left_toggle)
             3 -> getString(R.string.bottom_right_toggle)
-            else -> "All Corners"
+            else -> getString(R.string.all_corners)
         }
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_custom_value, null)
@@ -228,10 +227,10 @@ class MainActivity : AppCompatActivity() {
 
         MaterialDialog(this, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             title(text = name)
-            customView(view = dialogView)
+            customView(view = dialogView, scrollable = true)
             positiveButton(R.string.dialog_ok) {
                 val newSize = dialogView.customSizeEditText.text.toString().toIntOrNull()
-                    ?: DEFAULT_SIZE
+                    ?: return@positiveButton
                 if (specific) {
                     Values.corners[index].size = newSize
                 } else {
@@ -239,16 +238,16 @@ class MainActivity : AppCompatActivity() {
                         it.size = newSize
                     }
                 }
+                this@MainActivity.sizeBar.progress = Values.commonSize()
 
                 updateService()
-                this@MainActivity.sizeBar.progress = Values.commonSize()
                 save()
             }
             cornerRadius(Values.commonSize().toFloat())
         }
     }
 
-    fun colorDialog(currentColor: Int, callback: ((Int) -> Unit)? = null) {
+    private fun colorDialog(currentColor: Int, callback: ((Int) -> Unit)) {
 
         val primaryPaletteWithBlack = ColorPalette.Primary
             .toMutableList()
@@ -277,7 +276,7 @@ class MainActivity : AppCompatActivity() {
                 waitForPositiveButton = false,
                 allowCustomArgb = true
             ) { _, color ->
-                callback?.invoke(color)
+                callback.invoke(color)
             }
             positiveButton(R.string.dialog_ok)
             cornerRadius(Values.commonSize().toFloat())
@@ -292,10 +291,9 @@ class MainActivity : AppCompatActivity() {
         currentVal.text = Values.commonSize().toString()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.canDrawOverlays(this@MainActivity)) {
-                Log.d("change size", "change size")
                 CornerService.cornerService?.refreshOverlay()
             } else {
-                Toast.makeText(this@MainActivity, "Overlay permission not granted", Toast.LENGTH_SHORT)
+                Toast.makeText(this@MainActivity, R.string.permission_not_granted, Toast.LENGTH_SHORT)
                     .show()
             }
         } else {
@@ -325,7 +323,7 @@ class MainActivity : AppCompatActivity() {
     private fun showHelp() {
         MaterialDialog(this, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             title(R.string.menu_item_help)
-            customView(R.layout.help_dialog)
+            customView(R.layout.help_dialog, scrollable = true)
             positiveButton(R.string.dialog_ok)
             cornerRadius(Values.commonSize().toFloat())
         }
@@ -384,7 +382,7 @@ class MainActivity : AppCompatActivity() {
         Persist.saveCorners(Values.corners)
     }
 
-    fun saveToggle() {
+    private fun saveToggle() {
         Persist.saveToggleState(Values.toggleState)
     }
 

@@ -13,10 +13,6 @@ object Values {
 
     var firstRun = true
 
-    fun listFromSize(size: Int): ArrayList<Int>{
-        return arrayListOf(size, size, size, size)
-    }
-
     fun commonSize(): Int{
         return corners.map { it.size }
             .groupingBy { it }

@@ -23,8 +23,8 @@ class CornerService : Service() {
 
     private var notifManager: NotificationManager? = null
 
-    lateinit var mView: View
-    lateinit var windowManager: WindowManager
+    private lateinit var mView: View
+    private lateinit var windowManager: WindowManager
 
 
     override fun onBind(intent: Intent): IBinder? {
@@ -104,7 +104,7 @@ class CornerService : Service() {
 
 
 
-        Log.d("configchange", "config changed, restarting overlay")
+        Log.d("configChange", "config changed, restarting overlay")
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -137,12 +137,15 @@ class CornerService : Service() {
         val height = screenSize.y
         val width = screenSize.x
 
-        val cwNavBar = windowManager.defaultDisplay.rotation == Surface.ROTATION_270
+        //when turned clockwise on Android N and up, the navigation bar moves to the left of the screen instead of staying on the right.
+        val cwNavBar = windowManager.defaultDisplay.rotation == Surface.ROTATION_270 && Build.VERSION.SDK_INT > Build.VERSION_CODES.M
         Log.d("cwNavBar", "$cwNavBar")
 
         val params = getParams(width, height)
 
         params.gravity = Gravity.TOP or Gravity.START
+
+        //when the navigation bar is on the left, the x is at the edge of the bar, not the edge of the screen, so it needs to be moved back
         params.x = if (cwNavBar) -getNavigationBarSize(applicationContext).x else 0
         params.y = 0
 

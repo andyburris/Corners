@@ -29,17 +29,19 @@ class QuickSettings : TileService() {
             } else {
                 stopService(serviceIntent)
             }
-            Persist.init(applicationContext)
             Persist.saveToggleState(Values.toggleState)
             update()
         }else{
+            Values.toggleState = false
+            Persist.init(applicationContext)
+            Persist.saveToggleState(Values.toggleState)
             Log.d("qsTile", "can't draw")
             Toast.makeText(applicationContext, R.string.permission_not_granted, Toast.LENGTH_LONG).show()
         }
 
     }
 
-    fun update(){
+    private fun update(){
         Values.toggleState = Persist.getSavedToggleState()
         val state = if (Values.toggleState && checkDrawOverlayPermission()){
             Tile.STATE_ACTIVE
@@ -51,7 +53,7 @@ class QuickSettings : TileService() {
         tile.updateTile()
     }
 
-    fun checkDrawOverlayPermission() : Boolean{
+    private fun checkDrawOverlayPermission() : Boolean{
         /* check if we already  have permission to draw over other apps */
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(applicationContext)
 

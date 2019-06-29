@@ -7,9 +7,9 @@ import android.util.Log
 
 
 object Persist {
-    val cornerNames = listOf("topL", "topR", "botL", "botR")
+    private val cornerNames = listOf("topL", "topR", "botL", "botR")
 
-    lateinit var prefs: SharedPreferences
+    private lateinit var prefs: SharedPreferences
 
     fun init(ctxt: Context) {
         if (!::prefs.isInitialized) {
@@ -42,7 +42,7 @@ object Persist {
         for (i in 0 until 4) {
             val name = cornerNames[i]
             val corner = with(prefs) {
-                val size = getInt("${name}Size", getOldSavedCornerSize(i))
+                val size = getInt("${name}Size", getOldSavedCornerSize())
                 val visible = getBoolean("${name}State", getOldCornerState(i))
                 val color = getInt("${name}Color", getOldColor())
                 Corner(size, visible, color)
@@ -53,7 +53,7 @@ object Persist {
     }
 
 
-    private fun getOldSavedCornerSize(i: Int): Int {
+    private fun getOldSavedCornerSize(): Int {
         return when {
             prefs.contains("corner_size") -> prefs.getInt("corner_size", DEFAULT_SIZE)
             else -> DEFAULT_SIZE
@@ -61,13 +61,13 @@ object Persist {
     }
 
 
-    fun getOldCornerState(i: Int): Boolean {
+    private fun getOldCornerState(i: Int): Boolean {
         val name = cornerNames[i]
         return prefs.getBoolean(name, DEFAULT_TOGGLE)
     }
 
 
-    fun getOldColor(): Int {
+    private fun getOldColor(): Int {
         Log.d("loadColor", "Loading color")
         return prefs.getInt("corner_color", -16777216)
     }

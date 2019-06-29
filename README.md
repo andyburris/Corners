@@ -1,3 +1,5 @@
+![Corners Image](app/src/main/res/mipmap-hdpi/ic_launcher.png)
+
 # Corners
 Simple Android app to round the corners of the screen
 
