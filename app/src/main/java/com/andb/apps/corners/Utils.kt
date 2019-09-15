@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Point
+import android.os.Build
 import android.util.Log
 import android.view.WindowManager
 
@@ -66,4 +67,9 @@ fun <A, B> List<Pair<A, B>>.forEachFlat(action: (first: A, second: B) -> Unit) {
 fun dpToPx(dp: Int): Int {
     val scale = Resources.getSystem().displayMetrics.density
     return (dp * scale).toInt()
+}
+
+fun landscapeFixDefault(): Boolean{
+    //when turned clockwise on Android N and up, the navigation bar moves to the left of the screen instead of staying on the right.
+    return Build.VERSION.SDK_INT > Build.VERSION_CODES.M
 }

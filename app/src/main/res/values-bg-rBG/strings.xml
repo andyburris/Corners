@@ -24,7 +24,7 @@
     <string name="about_translations_title">Преводачи</string>
     <string name="about_translations_desc">Благодарение на:</string>
     <!--Other-->
-    <string name="permission_not_granted">Не е разрешен достъп за показване отгоре!</string>
+    <string name="permission_not_granted">Не е разрешен достъп за показване на слоя за ъглите!</string>
     <string name="permission_service_sync_error_text">Corners: не е разрешено на приложението да се показва отгоре, но услугата е включена.
 Молим ви да изключите услугата или да ѝ дадете права.</string>
     <!-- 
@@ -38,4 +38,18 @@
 Можете да повторите това отпътуване отново, като отидете в менюто за помощ.</string>
     <string name="individual_corners">Индивидуални Ъгли</string>
     <string name="all_corners">Всички ъгли</string>
+    <string name="landscape_fix_title">Поправка на пейзажният режим</string>
+    <string name="landscape_fix_desc">На някои устройства, слоят за ъглите грешно поставен когато устройството е завъртяно в пейзажен режим. Ако това ви се случва, може да отметнете тази настройка и проблемът ще се оправи.</string>
+    <string name="help_notification_hide_title">Скрийте Известието</string>
+    <string name="help_notification_hide_text">За да бъдете сигурни, че услугата няма да бъде спряна от операционната система, трябва да да се показва едно известие.
+Обаче, защото това е единственото известие от приложението, вие ще можете да го скриете.
+Задръжте върху известието и го изключете. Винаги можете да го включите отново в настройките на устройството Ви.
+Можете да изгледате упътването отново в менюто за Помощ.</string>
+    <string name="help_custom_corner_title">Индивидуални Размери</string>
+    <!-- 
+    
+    <string name="accessibility_service_description">Allow Corners to overlay the lockscreen and notification bar, as well as detect the current app for app-by-app enabling</string>
+-->
+    <string name="action_settings">Настройки</string>
+    <string name="notification_hide_kill">ОК</string>
 </resources>

@@ -99,4 +99,18 @@ object Persist {
         else
             true
     }
+
+    fun saveLandscapeFix(landscapeFix: Boolean){
+        val editor = prefs.edit()
+        editor.putBoolean("landscape_fix", landscapeFix)
+        editor.apply()
+    }
+
+    fun getSavedLandscapeFix(): Boolean{
+        return if(prefs.contains("landscape_fix"))
+            prefs.getBoolean("landscape_fix", false)
+        else
+            false
+    }
+
 }

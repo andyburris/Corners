@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: com.afollestad.material-dialogs:color:3.1.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1bf632617bd529370478f5ffaa8770b9/color-3.1.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1bf632617bd529370478f5ffaa8770b9/color-3.1.0/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.afollestad.material-dialogs/color/3.1.0/5d7e36039f691f23f25e9e57a613d8e2efebb457/color-3.1.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.afollestad.material-dialogs/color/3.1.0/c58f7bac97c234316cc17b99c93374c8b4c0ad0/color-3.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

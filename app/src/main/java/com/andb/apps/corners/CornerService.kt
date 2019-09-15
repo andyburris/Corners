@@ -137,16 +137,14 @@ class CornerService : Service() {
         val height = screenSize.y
         val width = screenSize.x
 
-        //when turned clockwise on Android N and up, the navigation bar moves to the left of the screen instead of staying on the right.
-        val cwNavBar = windowManager.defaultDisplay.rotation == Surface.ROTATION_270 && Build.VERSION.SDK_INT > Build.VERSION_CODES.M
-        Log.d("cwNavBar", "$cwNavBar")
+        Log.d("cwNavBar", "${(landscapeFixDefault() xor Values.landscapeFix) && windowManager.defaultDisplay.rotation == Surface.ROTATION_270}")
 
         val params = getParams(width, height)
 
         params.gravity = Gravity.TOP or Gravity.START
 
         //when the navigation bar is on the left, the x is at the edge of the bar, not the edge of the screen, so it needs to be moved back
-        params.x = if (cwNavBar) -getNavigationBarSize(applicationContext).x else 0
+        params.x = if ((landscapeFixDefault() xor Values.landscapeFix) && windowManager.defaultDisplay.rotation == Surface.ROTATION_270) -getNavigationBarSize(applicationContext).x else 0
         params.y = 0
 
         setCorners()

@@ -9,10 +9,10 @@ import android.util.Log
 class Autostart : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-
-
+        Log.d("cornersBR", "received intent")
         when(intent.action){
             Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED->{
+                Log.d("cornersBR", "received matching intent")
 
                 Persist.init(context)
 

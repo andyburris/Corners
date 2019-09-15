@@ -48,4 +48,22 @@
         android:paddingTop="8dp"
         android:text="@string/help_custom_corner_text" />
 
+    <TextView
+        android:id="@+id/landscapeFixTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/landscape_fix_title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/landscapeFixText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="@string/landscape_fix_desc" />
+
 </LinearLayout>

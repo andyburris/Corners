@@ -32,9 +32,16 @@
 -->
     <string name="notification_hide_title">Hide Notification</string>
     <string name="notification_hide_text">To ensure the service won\'t be killed when memory is low, a notification needs to be shown.
-        However, since this is the app\'s only notification, you can hide it and it will achieve the same effect as having none at all.
-        You can do this by long pressing on the notification and toggling the switch. You can always reshow it by going to the app\'s settings.
-        You can show this tutorial again in the overflow menu.</string>
+        However, you can hide the notification yourself, and the service still won\'t be killed.
+        You can do this usually by long pressing on the notification and toggling the switch, or if that isn\'t available on your device, by going to the app\'s settings and toggling it from there.
+    </string>
     <string name="individual_corners">Individual Corners</string>
     <string name="all_corners">All Corners</string>
+    <string name="landscape_fix_title">Landscape Fix</string>
+    <string name="landscape_fix_desc">On some devices, the overlay is misplaced when the device is rotated to landscape. If this is the case, you can toggle the checkbox, which should fix the issue</string>
+    <string name="action_settings">Settings</string>
+    <string name="help_custom_corner_title">Individual Sizes</string>
+    <string name="help_notification_hide_text">To ensure the service won\'t be killed when memory is low, a notification needs to be shown. However, since this is the app\'s only notification, you can hide it and it will achieve the same effect as having none at all. You can do this by long pressing on the notification and toggling the switch. You can always reshow it by going to the app\'s settings. You can show this tutorial again in the overflow menu.</string>
+    <string name="help_notification_hide_title">Hide Notification</string>
+    <string name="notification_hide_kill">OK</string>
 </resources>

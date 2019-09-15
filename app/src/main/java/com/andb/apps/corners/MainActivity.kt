@@ -156,6 +156,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        landscapeFixSwitch.isChecked = Values.landscapeFix
+        landscapeFixSwitch.setOnCheckedChangeListener { _, isChecked ->
+            Values.landscapeFix = isChecked
+            Persist.saveLandscapeFix(Values.landscapeFix)
+            updateService()
+        }
+
         setupIndividual()
 
     }

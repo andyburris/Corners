@@ -6,12 +6,12 @@ const val DEFAULT_COLOR = -16777216  //black
 
 object Values {
     var toggleState = false
-/*    var sizes = arrayListOf(DEFAULT_SIZE, DEFAULT_SIZE, DEFAULT_SIZE, DEFAULT_SIZE)
-    var cornerStates: ArrayList<Boolean> = ArrayList(listOf(DEFAULT_TOGGLE, DEFAULT_TOGGLE, DEFAULT_TOGGLE, DEFAULT_TOGGLE))
-    var cornerColor = -16777216  //black*/
+
     var corners = arrayListOf(Corner(), Corner(), Corner(), Corner())
 
     var firstRun = true
+
+    var landscapeFix = false
 
     fun commonSize(): Int{
         return corners.map { it.size }
